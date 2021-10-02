@@ -7,9 +7,3 @@
 #define BTN2LED 6
 #define BTN3LED 9
 #define BTN4LED 10
-
-#define LED_LOW_INT 20
-#define LED_HIGH_INT 70
-
-#define DEBOUNCE_TIME 50
-#define MIN_PRESS 15
