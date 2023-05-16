@@ -3,9 +3,10 @@
 
 #include <stdio.h>
 #include <Arduino.h>
+#include <NeoPixelBus.h>
 
-#define LED_LOW_INT 1
-#define LED_HIGH_INT 255
+#define LED_LOW_INT 51
+#define LED_HIGH_INT 173
 
 #define DEBOUNCE_TIME 10
 #define MIN_PRESS 5
@@ -13,7 +14,7 @@
 class Button
 {
 public:
-    Button(uint8_t btn, uint8_t led, void (*callbackOn)(void), void (*callbackOff)(void));
+    Button(uint8_t btn, RgbColor col, void (*callbackOn)(void), void (*callbackOff)(void));
     void SetCallbacks(void (*callbackOn)(void), void (*callbackOff)(void));
     void Tick();
 
@@ -33,6 +34,8 @@ public:
      * Turns the button's LED off.
      */
     void LedOff();
+
+    RgbColor GetLedColorState(){return ledColorState;};
 
     
     /**
@@ -59,15 +62,17 @@ public:
 
 private:
     uint8_t btnPin;
-    uint8_t ledPin;
-    bool btnPressed = false;
-    bool btnReleased = true;
-    uint32_t lastPressMillis = 0;
+    RgbColor color;
+    RgbColor ledColorState;
+
+    bool oldState = false;
+    
+    unsigned long lastChangeMillis = 0;
     void (*actionOn)(void);
     void (*actionOff)(void);
 
     //LED stuff
-    uint32_t lastFlash = 0;
+    unsigned long lastFlash = 0;
     /**
      * Current flashing time in ms. 0 means flashing is off.
      */

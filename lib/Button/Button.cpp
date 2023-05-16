@@ -2,14 +2,14 @@
 #define BUTTON_C
 #include "Button.h"
 
-Button::Button(uint8_t btn, uint8_t led, void (*callbackOn)(void), void (*callbackOff)(void))
+Button::Button(uint8_t btn, RgbColor col, void (*callbackOn)(void), void (*callbackOff)(void))
 {
     btnPin = btn;
-    ledPin = led;
+    color = col;
+    ledColorState = RgbColor(0);
     actionOn = callbackOn;
     actionOff = callbackOff;
     pinMode(btnPin, INPUT_PULLUP);
-    pinMode(ledPin, OUTPUT);
     LedOff();
 }
 
@@ -21,57 +21,48 @@ void Button::SetCallbacks(void (*callbackOn)(void), void (*callbackOff)(void))
 
 void Button::Tick()
 {
-    uint32_t time = millis();
+    unsigned long time = millis();
+    bool newState = (digitalRead(btnPin) == LOW);
 
-    // Button released
-    if (digitalRead(btnPin) == HIGH && (time - lastPressMillis > DEBOUNCE_TIME) && !btnPressed && !btnReleased)
+    // Button state changed for enough time (DEBOUNCE_TIME)
+    if (oldState != newState && (time - lastChangeMillis > DEBOUNCE_TIME))
     {
-        if (ledState && flashingSpeed == 0)
-            LedDimm();
-        actionOff();
-        btnReleased = true;
-        lastPressMillis = time;
-    }
+        oldState = newState;
+        lastChangeMillis = time;
 
-    // Button pressed
-    if (digitalRead(btnPin) == LOW && (time - lastPressMillis > DEBOUNCE_TIME) && !btnPressed && btnReleased)
-    {
-        btnPressed = true;
-        btnReleased = false;
-        lastPressMillis = time;
-    }
-
-    // Action
-    if (btnPressed && (time - lastPressMillis > MIN_PRESS))
-    {
-        LedOn();
-        actionOn();
-        btnPressed = false;
-    }
-
-    //LED flashing stuff
-    if (flashingSpeed > 0)
-    {
-        if (time - lastFlash > flashingSpeed)
+        if (newState)
         {
-            if (flashes > 0 && flashCount >= flashes)
+            LedOn();
+            actionOn();
+        }
+        else
+        {
+            if (ledState && flashingSpeed == 0)
+                LedDimm();
+            actionOff();
+        }
+    }
+
+    // LED flashing stuff
+    if (flashingSpeed != 0 && (time - lastFlash > flashingSpeed))
+    {
+        //If we flashed out our count or it's indefinite turn flashing off.
+        if (flashes != 0 && flashCount >= flashes)
+        {
+            FlashOff();
+        }
+        else
+        {
+            if (ledState)
             {
-                FlashOff();
+                LedDimm();
             }
             else
             {
-                if (ledState)
-                {
-                    ledState = false;
-                    analogWrite(ledPin, LED_LOW_INT);
-                }
-                else
-                {
-                    LedOn(flashIntensity);
-                    flashCount++;
-                }
-                lastFlash = time;
+                LedOn(flashIntensity);
+                flashCount++;
             }
+            lastFlash = time;
         }
     }
 }
@@ -79,7 +70,7 @@ void Button::Tick()
 void Button::LedOn(uint8_t intensity)
 {
     ledState = true;
-    analogWrite(ledPin, intensity);
+    ledColorState = color.Dim(intensity);
 }
 
 void Button::FlashOff()
@@ -91,13 +82,13 @@ void Button::FlashOff()
 void Button::LedOff()
 {
     ledState = false;
-    digitalWrite(ledPin, LOW);
+    ledColorState = RgbColor(0);
 }
 
 void Button::LedDimm()
 {
     ledState = false;
-    analogWrite(ledPin, LED_LOW_INT);
+    LedOn(LED_LOW_INT);
 }
 
 void Button::Flash(uint8_t number, uint16_t speed, uint8_t intensity)
