@@ -6,6 +6,8 @@
 #include "MIDIUSB.h"
 #include "HID-Project.h"
 
+#define SERIAL_DEBUG 0
+
 #include <config.h>
 
 typedef enum Modes : uint8_t
@@ -82,6 +84,9 @@ void setup()
 {
   // this resets all the neopixels to an off state
   strip.Begin();
+  
+  //Serial.begin(115200);
+
   for (uint8_t i = 0; i < NUM_BUTTONS; i++)
   {
     buttons[i].Tick();
@@ -93,16 +98,30 @@ void setup()
   buttons[1].Flash();
   buttons[2].Flash();
 
-  uint32_t time = millis();
-  while (currentMode == UNKNOWN && millis() - time < 3000)
+  unsigned long start = millis();
+  unsigned long lastMillis = millis();
+  unsigned long time = millis();
+
+  // For the first 3 second
+  while (currentMode == UNKNOWN && time - start < 3000)
   {
+
+    time = millis();
+
     for (uint8_t i = 0; i < NUM_BUTTONS; i++)
     {
       buttons[i].Tick();
       strip.SetPixelColor(i, buttons[i].GetLedColorState());
     }
-    strip.Show();
+
+    if (time % 100 == 0 && lastMillis != time)
+    {
+      //Serial.println(time);
+      strip.Show();
+      lastMillis = time;
+    }
   }
+
   for (uint8_t i = 0; i < NUM_BUTTONS; i++)
   {
     buttons[i].LedDimm();

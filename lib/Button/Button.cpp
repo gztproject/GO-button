@@ -49,16 +49,19 @@ void Button::Tick()
         //If we flashed out our count or it's indefinite turn flashing off.
         if (flashes != 0 && flashCount >= flashes)
         {
+            //Serial.println("Flashing off.");
             FlashOff();
         }
         else
         {
             if (ledState)
             {
+                //Serial.println("Flashing --");
                 LedDimm();
             }
             else
             {
+                //Serial.println("Flashing ++");
                 LedOn(flashIntensity);
                 flashCount++;
             }
@@ -86,9 +89,9 @@ void Button::LedOff()
 }
 
 void Button::LedDimm()
-{
-    ledState = false;
+{    
     LedOn(LED_LOW_INT);
+    ledState = false;
 }
 
 void Button::Flash(uint8_t number, uint16_t speed, uint8_t intensity)
