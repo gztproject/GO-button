@@ -35,6 +35,10 @@ public:
      */
     void LedOff();
 
+    void SetLedColor(RgbColor col);
+    void SetDefaultColor();
+
+
     RgbColor GetLedColorState(){return ledColorState;};
 
     
@@ -62,6 +66,7 @@ public:
 
 private:
     uint8_t btnPin;
+    RgbColor defaultColor;
     RgbColor color;
     RgbColor ledColorState;
 

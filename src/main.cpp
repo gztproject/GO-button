@@ -98,6 +98,10 @@ void setup()
   }
   strip.Show();
 
+  buttons[0].SetLedColor(red);
+  buttons[1].SetLedColor(cyan);
+  buttons[2].SetLedColor(purple);
+
   buttons[0].Flash();
   buttons[1].Flash();
   buttons[2].Flash();
@@ -118,7 +122,7 @@ void setup()
       strip.SetPixelColor(i, buttons[i].GetLedColorState());
     }
 
-    if (time % 100 == 0 && lastMillis != time)
+    if (time % 50 == 0 && lastMillis != time)
     {
       // Serial.println(time);
       strip.Show();
@@ -126,12 +130,6 @@ void setup()
     }
   }
 
-  for (uint8_t i = 0; i < NUM_BUTTONS; i++)
-  {
-    buttons[i].LedDimm();
-    strip.SetPixelColor(i, buttons[i].GetLedColorState());
-  }
-  strip.Show();
   if (currentMode == UNKNOWN)
   {
     switch (DEFAULT_MODE)
@@ -147,6 +145,19 @@ void setup()
       break;
     }
   }
+
+
+  buttons[0].SetDefaultColor();
+  buttons[1].SetDefaultColor();
+  buttons[2].SetDefaultColor();
+
+  for (uint8_t i = 0; i < NUM_BUTTONS; i++)
+  {
+    buttons[i].LedDimm();
+    strip.SetPixelColor(i, buttons[i].GetLedColorState());
+  }
+
+  strip.Show();  
 }
 
 void loop()
@@ -159,7 +170,7 @@ void loop()
     strip.SetPixelColor(i, buttons[i].GetLedColorState());
   }
 
-  if (time % 100 == 0 && lastMillis != time)
+  if (time % 50 == 0 && lastMillis != time)
   {
     // Serial.println(time);
     strip.Show();

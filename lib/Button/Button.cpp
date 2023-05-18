@@ -5,7 +5,8 @@
 Button::Button(uint8_t btn, RgbColor col, void (*callbackOn)(void), void (*callbackOff)(void))
 {
     btnPin = btn;
-    color = col;
+    defaultColor = col;
+    color = defaultColor;
     ledColorState = RgbColor(0);
     actionOn = callbackOn;
     actionOff = callbackOff;
@@ -46,22 +47,22 @@ void Button::Tick()
     // LED flashing stuff
     if (flashingSpeed != 0 && (time - lastFlash > flashingSpeed))
     {
-        //If we flashed out our count or it's indefinite turn flashing off.
+        // If we flashed out our count or it's indefinite turn flashing off.
         if (flashes != 0 && flashCount >= flashes)
         {
-            //Serial.println("Flashing off.");
+            // Serial.println("Flashing off.");
             FlashOff();
         }
         else
         {
             if (ledState)
             {
-                //Serial.println("Flashing --");
+                // Serial.println("Flashing --");
                 LedDimm();
             }
             else
             {
-                //Serial.println("Flashing ++");
+                // Serial.println("Flashing ++");
                 LedOn(flashIntensity);
                 flashCount++;
             }
@@ -89,9 +90,29 @@ void Button::LedOff()
 }
 
 void Button::LedDimm()
-{    
+{
     LedOn(LED_LOW_INT);
     ledState = false;
+}
+
+void Button::SetLedColor(RgbColor col)
+{
+    color = col;
+    
+    if(ledState)
+    {
+        LedOn();
+    }
+}
+
+void Button::SetDefaultColor()
+{
+    color = defaultColor;
+
+    if(ledState)
+    {
+        LedOn();
+    }
 }
 
 void Button::Flash(uint8_t number, uint16_t speed, uint8_t intensity)
