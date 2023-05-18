@@ -61,6 +61,10 @@ void emptyCallback();
 
 Modes currentMode = UNKNOWN;
 
+unsigned long start;
+unsigned long lastMillis;
+unsigned long time;
+
 // three element pixels, in different order and speeds
 NeoPixelBus<NeoGrbFeature, NeoWs2812Method> strip(NUM_BUTTONS, LED_PIN);
 
@@ -84,8 +88,8 @@ void setup()
 {
   // this resets all the neopixels to an off state
   strip.Begin();
-  
-  //Serial.begin(115200);
+
+  // Serial.begin(115200);
 
   for (uint8_t i = 0; i < NUM_BUTTONS; i++)
   {
@@ -98,9 +102,9 @@ void setup()
   buttons[1].Flash();
   buttons[2].Flash();
 
-  unsigned long start = millis();
-  unsigned long lastMillis = millis();
-  unsigned long time = millis();
+  start = millis();
+  lastMillis = millis();
+  time = millis();
 
   // For the first 3 second
   while (currentMode == UNKNOWN && time - start < 3000)
@@ -116,7 +120,7 @@ void setup()
 
     if (time % 100 == 0 && lastMillis != time)
     {
-      //Serial.println(time);
+      // Serial.println(time);
       strip.Show();
       lastMillis = time;
     }
@@ -147,12 +151,20 @@ void setup()
 
 void loop()
 {
+  time = millis();
+  
   for (uint8_t i = 0; i < 5; i++)
   {
     buttons[i].Tick();
     strip.SetPixelColor(i, buttons[i].GetLedColorState());
   }
-  strip.Show();
+
+  if (time % 100 == 0 && lastMillis != time)
+  {
+    // Serial.println(time);
+    strip.Show();
+    lastMillis = time;
+  }
 }
 
 void setMidiMode()
