@@ -1,4 +1,5 @@
 #define NUM_BUTTONS 5
+#define NUM_PRESETS NUM_BUTTONS
 
 #define BTN_0_PIN 17  //PB0
 #define BTN_1_PIN 23  //PF0
@@ -7,6 +8,9 @@
 #define BTN_4_PIN 30  //PD5
 
 #define LED_PIN 16  // PB2 - MOSI
+
+#define LED_LOW_INT 51
+#define LED_HIGH_INT 173
 
 #define BTN_0_COL blue
 #define BTN_1_COL blue

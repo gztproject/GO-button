@@ -45,17 +45,22 @@ public:
     bool SetName(char *buf, size_t size);
     void SetMode(HwModes mode);
     bool SetActions(Action *actions);
-
+    void SetColor(RgbColor color, uint8_t intensity);
     uint8_t GetId() { return id; };
     size_t GetName(char *buf);
     HwModes GetMode() { return mode; };
     size_t GetActions(Action *actions);
+    RgbColor GetColor() { return color; };
+    uint8_t GetIntensity() { return intensity; };
 
 private:
     uint8_t id;
     char name[PRESET_NAME_SIZE];
     HwModes mode;
     Action actions[NUM_BUTTONS];
+
+    RgbColor color;
+    uint8_t intensity;
 
     Action emptyAction = {
         .callbackOn = emptyCallback,

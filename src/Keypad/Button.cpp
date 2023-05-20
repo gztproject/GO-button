@@ -5,18 +5,36 @@
 Button::Button()
 {
     btnPin = 0;
-    defaultColor = RgbColor{0};
-    color = defaultColor;
+    baseColor = RgbColor{0};
+    baseIntensity = 0;
+    accentColor = RgbColor{0};
+    accentIntensity = 0;
     ledColorState = RgbColor(0);
     actionOn = {};
-    actionOff = {};    
+    actionOff = {};
 }
 
-Button::Button(uint8_t btn, RgbColor col, void (*callbackOn)(void), void (*callbackOff)(void))
+Button::Button(uint8_t btn, RgbColor col, uint8_t ledInt, void (*callbackOn)(void), void (*callbackOff)(void))
 {
     btnPin = btn;
-    defaultColor = col;
-    color = defaultColor;
+    baseColor = col;
+    baseIntensity = ledInt;
+    accentColor = col;
+    accentIntensity = ledInt;
+    ledColorState = RgbColor(0);
+    actionOn = callbackOn;
+    actionOff = callbackOff;
+    pinMode(btnPin, INPUT_PULLUP);
+    LedOff();
+}
+
+Button::Button(uint8_t btn, RgbColor bCol, uint8_t bInt, RgbColor aCol, uint8_t aInt, void (*callbackOn)(void), void (*callbackOff)(void))
+{
+    btnPin = btn;
+    baseColor = bCol;
+    baseIntensity = bInt;
+    accentColor = aCol;
+    accentIntensity = aInt;
     ledColorState = RgbColor(0);
     actionOn = callbackOn;
     actionOff = callbackOff;
@@ -43,13 +61,13 @@ void Button::Tick()
 
         if (newState)
         {
-            LedOn();
+            LedAccent();
             actionOn();
         }
         else
         {
-            if (ledState && flashingSpeed == 0)
-                LedDimm();
+            if ((ledIntensityState > baseIntensity) && flashingSpeed == 0)
+                LedBase();
             actionOff();
         }
     }
@@ -65,15 +83,15 @@ void Button::Tick()
         }
         else
         {
-            if (ledState)
+            if (ledIntensityState > baseIntensity)
             {
                 // Serial.println("Flashing --");
-                LedDimm();
+                LedBase();
             }
             else
             {
                 // Serial.println("Flashing ++");
-                LedOn(flashIntensity);
+                LedAccent();
                 flashCount++;
             }
             lastFlash = time;
@@ -81,10 +99,26 @@ void Button::Tick()
     }
 }
 
-void Button::LedOn(uint8_t intensity)
+void Button::LedOn(RgbColor color, uint8_t intensity)
 {
-    ledState = true;
     ledColorState = color.Dim(intensity);
+    ledIntensityState = intensity;
+}
+
+/** @deprecated */
+void Button::LedDimm()
+{
+    LedBase();
+}
+
+void Button::LedBase()
+{
+    LedOn(baseColor, baseIntensity);
+}
+
+void Button::LedAccent()
+{
+    LedOn(accentColor, accentIntensity);
 }
 
 void Button::FlashOff()
@@ -95,33 +129,27 @@ void Button::FlashOff()
 
 void Button::LedOff()
 {
-    ledState = false;
+    ledIntensityState = 0;
     ledColorState = RgbColor(0);
 }
 
-void Button::LedDimm()
+void Button::SetBaseColor(RgbColor col, uint8_t intensity)
 {
-    LedOn(LED_LOW_INT);
-    ledState = false;
-}
-
-void Button::SetLedColor(RgbColor col)
-{
-    color = col;
-    
-    if(ledState)
+    baseColor = col;
+    baseIntensity = intensity;
+    if (ledIntensityState > 0 && ledIntensityState < accentIntensity)
     {
-        LedOn();
+        LedBase();
     }
 }
 
-void Button::SetDefaultColor()
+void Button::SetAccentColor(RgbColor col, uint8_t intensity)
 {
-    color = defaultColor;
-
-    if(ledState)
+    accentColor = col;
+    accentIntensity = intensity;
+    if (ledIntensityState > baseIntensity)
     {
-        LedOn();
+        LedAccent();
     }
 }
 

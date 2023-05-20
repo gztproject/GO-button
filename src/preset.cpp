@@ -7,6 +7,7 @@ Preset::Preset(uint8_t id)
     Preset::id = id;
     name[0] = '\0';
     mode = UNKNOWN;
+    color = black;
     clearActions();
 }
 
@@ -36,6 +37,12 @@ bool Preset::SetActions(Action *actions)
         Preset::actions[i] = actions[i];
     }
     return true;
+}
+
+void Preset::SetColor(RgbColor color, uint8_t intensity)
+{
+    Preset::color = color;
+    Preset::intensity = intensity;
 }
 
 size_t Preset::GetName(char *buf)

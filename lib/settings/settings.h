@@ -32,14 +32,20 @@ namespace SETTINGS
 
     typedef enum _settingCode : uint8_t
     {
-        defaultMode = 0x00, // Mode 1 - 5
-
+        useLastAsDefault,
+        defaultPreset,
+        lastPreset,
+        presets,
+        presetSelectTime,
     } settingCode;
 
     struct settingsContainer
     {
         bool useLastAsDefault;
-        Preset defaultPreset;        
+        uint8_t defaultPreset;
+        uint8_t lastPreset;
+        Preset presets[NUM_PRESETS];
+        uint8_t presetSelectTime;
     };
 
     struct EEPROMpacket
@@ -56,7 +62,16 @@ namespace SETTINGS
 
     settingsContainer getSettings(void);
 
+#pragma region GETTERS
     Preset GetActivePreset();
+    Preset GetPreset(uint8_t id);
+    uint8_t GetPresetSelectTime();
+#pragma endregion GETTERS
+
+#pragma region SETTERS
+    bool SetDefaultPreset(uint8_t id);
+    bool SetPresetSelectTime(uint8_t time);
+#pragma endregion SETTERS
 
     /**
      * Prints a JSON array of settings to UART.
@@ -70,9 +85,6 @@ namespace SETTINGS
      *
      */
     void printJson(bool print(const char *), bool await(void));
-
-    // Setters
-    bool SetDefaultPreset(Preset preset);
 
     /**
      * Try to parse and set the setting from JSON pair ("code":"value").
