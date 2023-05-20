@@ -14,6 +14,7 @@
 class Button
 {
 public:
+    Button();
     Button(uint8_t btn, RgbColor col, void (*callbackOn)(void), void (*callbackOff)(void));
     void SetCallbacks(void (*callbackOn)(void), void (*callbackOff)(void));
     void Tick();

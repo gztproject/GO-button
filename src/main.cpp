@@ -1,5 +1,7 @@
 #include <Arduino.h>
 
+#include "../lib/settings/settings.h"
+
 #include <NeoPixelBus.h>
 #include "Button.h"
 // #include <Keyboard.h>
@@ -9,14 +11,6 @@
 #define SERIAL_DEBUG 0
 
 #include <config.h>
-
-typedef enum Modes : uint8_t
-{
-  UNKNOWN = 00,
-  KB_MODE = 10,
-  MIDI_MODE = 20,
-  HID_MODE = 30
-} Modes;
 
 void setMidiMode();
 void midiCallbackOn0();
@@ -59,7 +53,7 @@ void hidCallbackOff4();
 
 void emptyCallback();
 
-Modes currentMode = UNKNOWN;
+SETTINGS::Modes currentMode = SETTINGS::Modes::UNKNOWN;
 
 unsigned long start;
 unsigned long lastMillis;
@@ -111,7 +105,7 @@ void setup()
   time = millis();
 
   // For the first 3 second
-  while (currentMode == UNKNOWN && time - start < 3000)
+  while (currentMode == SETTINGS::Modes::UNKNOWN && time - start < 3000)
   {
 
     time = millis();
@@ -130,17 +124,17 @@ void setup()
     }
   }
 
-  if (currentMode == UNKNOWN)
+  if (currentMode == SETTINGS::Modes::UNKNOWN)
   {
     switch (DEFAULT_MODE)
     {
-    case KB_MODE:
+    case SETTINGS::Modes::KB_MODE:
       setKeyboardMode();
       break;
-    case MIDI_MODE:
+    case SETTINGS::Modes::MIDI_MODE:
       setMidiMode();
       break;
-    case HID_MODE:
+    case SETTINGS::Modes::HID_MODE:
       setHIDMode();
       break;
     }
@@ -184,7 +178,7 @@ void setMidiMode()
   buttons[1].FlashOff();
   buttons[2].FlashOff();
   buttons[1].Flash(5, 100);
-  currentMode = MIDI_MODE;
+  currentMode = SETTINGS::Modes::MIDI_MODE;
   buttons[0].SetCallbacks(midiCallbackOn0, midiCallbackOff0);
   buttons[1].SetCallbacks(midiCallbackOn1, midiCallbackOff1);
   buttons[2].SetCallbacks(midiCallbackOn2, midiCallbackOff2);
@@ -269,7 +263,7 @@ void setKeyboardMode()
   buttons[1].FlashOff();
   buttons[2].FlashOff();
   buttons[0].Flash(5, 100);
-  currentMode = KB_MODE;
+  currentMode = SETTINGS::Modes::KB_MODE;
   Keyboard.begin();
   buttons[0].SetCallbacks(kbCallbackOn0, kbCallbackOff0);
   buttons[1].SetCallbacks(kbCallbackOn1, kbCallbackOff1);
@@ -334,7 +328,7 @@ void setHIDMode()
   buttons[1].FlashOff();
   buttons[2].FlashOff();
   buttons[2].Flash(5, 100);
-  currentMode = HID_MODE;
+  currentMode = SETTINGS::Modes::HID_MODE;
   Consumer.begin();
   buttons[0].SetCallbacks(hidCallbackOn0, hidCallbackOff0);
   buttons[1].SetCallbacks(hidCallbackOn1, hidCallbackOff1);

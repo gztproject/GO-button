@@ -2,6 +2,16 @@
 #define BUTTON_C
 #include "Button.h"
 
+Button::Button()
+{
+    btnPin = 0;
+    defaultColor = RgbColor{0};
+    color = defaultColor;
+    ledColorState = RgbColor(0);
+    actionOn = {};
+    actionOff = {};    
+}
+
 Button::Button(uint8_t btn, RgbColor col, void (*callbackOn)(void), void (*callbackOff)(void))
 {
     btnPin = btn;

@@ -40,6 +40,7 @@ void emptyCallback(){};
 class Preset
 {
 public:
+    Preset() { Preset(0); };
     Preset(uint8_t id);
     bool SetName(char *buf, size_t size);
     void SetMode(HwModes mode);
