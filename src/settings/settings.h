@@ -1,15 +1,3 @@
-// **************************************************************
-// **** AlfaCen MainBoard, nastavitve
-// ****
-// **** Tu se nahahjo predvsem FW nastavitve (časi, timeouti, naslovi ipd.), ki se med reseti shranjujejo v EEPROM.
-// **** Ob zagonu jih preberem v globalne spremenljivke in po potrebi posodobim v EEPROM.
-// **** HW konstante so v config.h.
-// ****
-// **** Martin Trampuš, jan. 2021
-// **** Gašper Doljak, jan. 2021
-// ****
-// **** Alfa Proxima d.o.o.
-// **************************************************************
 #ifndef _SETTINGS_H
 #define _SETTINGS_H
 
@@ -17,7 +5,7 @@
 #include <stdio.h>
 #include "config.h"
 
-#include "preset.h"
+#include "Keypad/preset.h"
 // namespace simulira "static class"
 namespace SETTINGS
 {
@@ -45,7 +33,7 @@ namespace SETTINGS
         uint8_t defaultPreset;
         uint8_t lastPreset;
         Preset presets[NUM_PRESETS];
-        uint8_t presetSelectTime;
+        uint8_t presetSelectTime;        
     };
 
     struct EEPROMpacket
@@ -62,16 +50,16 @@ namespace SETTINGS
 
     settingsContainer getSettings(void);
 
-#pragma region GETTERS
+// #pragma region GETTERS
     Preset GetActivePreset();
     Preset GetPreset(uint8_t id);
     uint8_t GetPresetSelectTime();
-#pragma endregion GETTERS
+// #pragma endregion GETTERS
 
-#pragma region SETTERS
+// #pragma region SETTERS
     bool SetDefaultPreset(uint8_t id);
     bool SetPresetSelectTime(uint8_t time);
-#pragma endregion SETTERS
+// #pragma endregion SETTERS
 
     /**
      * Prints a JSON array of settings to UART.

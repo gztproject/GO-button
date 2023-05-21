@@ -1,13 +1,13 @@
 #include "preset.h"
 
-#pragma region Public
+// #pragma region Public
 
 Preset::Preset(uint8_t id)
 {
     Preset::id = id;
     name[0] = '\0';
     mode = UNKNOWN;
-    color = black;
+    color = BLACK;
     clearActions();
 }
 
@@ -30,11 +30,11 @@ void Preset::SetMode(HwModes mode)
     clearActions();
 }
 
-bool Preset::SetActions(Action *actions)
+bool Preset::SetButtons(BtnPreset *btnPresets)
 {
     for (uint8_t i = 0; i < NUM_BUTTONS; i++)
     {
-        Preset::actions[i] = actions[i];
+        Preset::btnPreset[i] = btnPreset[i];
     }
     return true;
 }
@@ -57,25 +57,25 @@ size_t Preset::GetName(char *buf)
     return i;
 }
 
-size_t Preset::GetActions(Action *actions)
+size_t Preset::GetButtons(BtnPreset *BtnPreset)
 {
     size_t i;
     for (i = 0; i < NUM_BUTTONS; i++)
     {
-        actions[i] = Preset::actions[i];
+        btnPreset[i] = Preset::btnPreset[i];
     }
     return i;
 }
 
-#pragma endregion Public
-#pragma region Private
+// #pragma endregion Public
+// #pragma region Private
 
 void Preset::clearActions()
 {
     for (uint8_t i = 0; i < NUM_BUTTONS; i++)
     {
-        actions[i] = emptyAction;
+        btnPreset[i] = emptyBtnPreset;
     }
 }
 
-#pragma endregion Private
+// #pragma endregion Private

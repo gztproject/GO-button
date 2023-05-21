@@ -3,7 +3,6 @@
 
 namespace SETTINGS
 {
-    settingsContainer defaults;    
     SettingsState state = SettingsState::New;
     settingsContainer settings;
     uint16_t address;
@@ -23,6 +22,19 @@ namespace SETTINGS
     void formatHex(uint8_t byte, char *ch);
     void formatByte(uint8_t byte, char *ch);
     void formatWord(uint16_t dbl, char *ch);
+
+    /*****************************************
+     ** DEFAULT SETTINGS
+     *****************************************
+     */
+
+    settingsContainer defaults =
+        {
+            .useLastAsDefault = false,
+            .defaultPreset = 0,
+            .lastPreset = 0,
+            .presets = {Preset(0), Preset(1), Preset(2), Preset(3), Preset(4)},
+            .presetSelectTime = 3};
 
     void init(uint16_t addr)
     {
@@ -60,7 +72,77 @@ namespace SETTINGS
         }
     }
 
-    // GETTERS
+    // #pragma region GETTERS
+    Preset GetActivePreset()
+    {
+        if (settings.useLastAsDefault)
+            return settings.presets[settings.lastPreset];
+
+        return settings.presets[settings.defaultPreset];
+    }
+
+    Preset GetPreset(uint8_t id)
+    {
+        return settings.presets[id];
+    }
+
+    uint8_t GetPresetSelectTime()
+    {
+        return settings.presetSelectTime;
+    }
+
+    // #pragma endregion GETTERS
+
+    // #pragma region SETTERS
+    bool SetUseLastAsDefault(bool ulad)
+    {
+        if (state != SettingsState::Fresh && state != SettingsState::Retained)
+            return false;
+        if (settings.useLastAsDefault == ulad)
+            return false;
+
+        settings.useLastAsDefault = ulad;
+        EEPROMpacket packet = {.settings = settings, .checksum = calculateChecksum(settings)};
+        return writePacket(packet);
+    }
+
+    bool SetDefaultPreset(uint8_t id)
+    {
+        if (state != SettingsState::Fresh && state != SettingsState::Retained)
+            return false;
+        if (settings.defaultPreset == id)
+            return false;
+
+        settings.defaultPreset = id;
+        EEPROMpacket packet = {.settings = settings, .checksum = calculateChecksum(settings)};
+        return writePacket(packet);
+    }
+
+    bool SetLastPreset(uint8_t id)
+    {
+        if (state != SettingsState::Fresh && state != SettingsState::Retained)
+            return false;
+        if (settings.lastPreset == id)
+            return false;
+
+        settings.lastPreset = id;
+        EEPROMpacket packet = {.settings = settings, .checksum = calculateChecksum(settings)};
+        return writePacket(packet);
+    }
+
+    bool SetPresets(Preset *arr)
+    {
+        if (state != SettingsState::Fresh && state != SettingsState::Retained)
+            return false;
+        if (settings.presets == arr)
+            return false;
+
+        memcpy(settings.presets, &arr[0], sizeof(settings.presets));
+        EEPROMpacket packet = {.settings = settings, .checksum = calculateChecksum(settings)};
+        return writePacket(packet);
+    }
+    // #pragma endregion SETTERS
+
     settingsContainer getSettings()
     {
         if (state != SettingsState::Fresh && state != SettingsState::Retained)
@@ -92,10 +174,25 @@ namespace SETTINGS
         tmp = strtok_r(NULL, ":", &saveptr);
         strncpy(val, &tmp[1], strlen(tmp) - 1);
         val[strlen(tmp) - 2] = '\0';
-
-        uint8_t arr[24] = {0};
+        
         switch (code)
         {
+        // bool
+        case settingCode::useLastAsDefault:
+            return SetUseLastAsDefault((bool)parseByte(val));
+            break;
+
+        // byte
+        case settingCode::lastPreset:
+            return SetLastPreset(parseByte(val));
+            break;
+        case settingCode::defaultPreset:
+            return SetDefaultPreset(parseByte(val));
+            break;
+        case settingCode::presetSelectTime:
+            return SetPresetSelectTime(parseByte(val));
+            break;
+           
         default:
             break;
         }

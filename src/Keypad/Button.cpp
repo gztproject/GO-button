@@ -4,48 +4,47 @@
 
 Button::Button()
 {
+    id = 0xFF;
     btnPin = 0;
-    baseColor = RgbColor{0};
+    baseColor = BLACK;
     baseIntensity = 0;
-    accentColor = RgbColor{0};
+    accentColor = BLACK;
     accentIntensity = 0;
-    ledColorState = RgbColor(0);
-    actionOn = {};
-    actionOff = {};
+    ledColorState = BLACK;
+    callback = {};    
 }
 
-Button::Button(uint8_t btn, RgbColor col, uint8_t ledInt, void (*callbackOn)(void), void (*callbackOff)(void))
+Button::Button(uint8_t id, uint8_t btn, RgbColor col, uint8_t ledInt, void (*callback)(uint8_t i, KeyActions action))
 {
+    Button::id = id;
     btnPin = btn;
     baseColor = col;
     baseIntensity = ledInt;
     accentColor = col;
     accentIntensity = ledInt;
-    ledColorState = RgbColor(0);
-    actionOn = callbackOn;
-    actionOff = callbackOff;
+    ledColorState = BLACK;
+    Button::callback = callback;
     pinMode(btnPin, INPUT_PULLUP);
     LedOff();
 }
 
-Button::Button(uint8_t btn, RgbColor bCol, uint8_t bInt, RgbColor aCol, uint8_t aInt, void (*callbackOn)(void), void (*callbackOff)(void))
+Button::Button(uint8_t id, uint8_t btn, RgbColor bCol, uint8_t bInt, RgbColor aCol, uint8_t aInt, void (*callback)(uint8_t i, KeyActions action))
 {
+    Button::id = id;
     btnPin = btn;
     baseColor = bCol;
     baseIntensity = bInt;
     accentColor = aCol;
     accentIntensity = aInt;
-    ledColorState = RgbColor(0);
-    actionOn = callbackOn;
-    actionOff = callbackOff;
+    ledColorState = BLACK;
+    Button::callback = callback;    
     pinMode(btnPin, INPUT_PULLUP);
     LedOff();
 }
 
-void Button::SetCallbacks(void (*callbackOn)(void), void (*callbackOff)(void))
+void Button::SetCallback(void (*callback)(uint8_t i, KeyActions action))
 {
-    actionOn = callbackOn;
-    actionOff = callbackOff;
+    Button::callback = callback; 
 }
 
 void Button::Tick()
@@ -62,13 +61,13 @@ void Button::Tick()
         if (newState)
         {
             LedAccent();
-            actionOn();
+            callback(id, KeyActions::ON);
         }
         else
         {
             if ((ledIntensityState > baseIntensity) && flashingSpeed == 0)
                 LedBase();
-            actionOff();
+            callback(id, KeyActions::OFF);
         }
     }
 
@@ -130,7 +129,7 @@ void Button::FlashOff()
 void Button::LedOff()
 {
     ledIntensityState = 0;
-    ledColorState = RgbColor(0);
+    ledColorState = BLACK;
 }
 
 void Button::SetBaseColor(RgbColor col, uint8_t intensity)

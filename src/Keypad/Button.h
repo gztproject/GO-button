@@ -2,19 +2,25 @@
 #define BUTTON_H
 
 #include <stdio.h>
-#include <Arduino.h>
-#include <NeoPixelBus.h>
+#include "preset.h"
 
 #define DEBOUNCE_TIME 10
 #define MIN_PRESS 5
+
+typedef enum _KeyActions : uint8_t
+{
+    ON,
+    OFF,
+    PRESS
+} KeyActions;
 
 class Button
 {
 public:
     Button();
-    Button(uint8_t btn, RgbColor col, uint8_t ledInt, void (*callbackOn)(void), void (*callbackOff)(void));
-    Button(uint8_t btn, RgbColor bCol, uint8_t bInt, RgbColor aCol, uint8_t aInt, void (*callbackOn)(void), void (*callbackOff)(void));
-    void SetCallbacks(void (*callbackOn)(void), void (*callbackOff)(void));
+    Button(uint8_t id, uint8_t btn, RgbColor col, uint8_t ledInt, void (*callback)(uint8_t i, KeyActions action));
+    Button(uint8_t id, uint8_t btn, RgbColor bCol, uint8_t bInt, RgbColor aCol, uint8_t aInt, void (*callback)(uint8_t i, KeyActions action));
+    void SetCallback(void (*callback)(uint8_t i, KeyActions action));
     void Tick();
 
     /**
@@ -64,6 +70,7 @@ public:
     void FlashOff();
 
 private:
+    uint8_t id;
     uint8_t btnPin;
 
     RgbColor baseColor;
@@ -78,8 +85,7 @@ private:
     bool oldState = false;
 
     unsigned long lastChangeMillis = 0;
-    void (*actionOn)(void);
-    void (*actionOff)(void);
+    void (*callback)(uint8_t i, KeyActions action);
 
     // LED stuff
     unsigned long lastFlash = 0;
