@@ -9,11 +9,11 @@
 #include <HID-Project.h>
 #include <MIDIUSB.h>
 
-#include "settings/settings.h"
+//#include "settings/settings.h"
 
 namespace Keypad
 {
-    bool Init();
+    bool Init(Preset *pres);
 
     bool SelectPreset(Preset preset);
 

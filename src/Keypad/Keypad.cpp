@@ -12,7 +12,8 @@ namespace Keypad
     unsigned long time;
     bool presetSelected;
     Button buttons[NUM_BUTTONS];
-    Preset activePreset;
+    Preset presets[NUM_PRESETS];
+    uint8_t activePreset;
     BtnPreset btnPresets[NUM_BUTTONS];
 
     NeoPixelBus<NeoGrbFeature, NeoWs2812Method> strip(NUM_BUTTONS, LED_PIN);
@@ -33,9 +34,13 @@ namespace Keypad
 
     // #pragma region Public
 
-    bool Init()
+    bool Init(Preset *pres)
     {
-        activePreset = SETTINGS::GetActivePreset();
+        for (uint8_t i = 0; i < NUM_PRESETS; i++)
+        {
+            presets[i] = pres[i];
+        }
+        activePreset = 0; // SETTINGS::GetActivePreset();
 
         Button buttons[NUM_BUTTONS] = {
             Button(0, BTN_0_PIN, BLACK, 0, PresetCallback),
@@ -51,7 +56,7 @@ namespace Keypad
         for (uint8_t i = 0; i < NUM_BUTTONS; i++)
         {
             buttons[i].Tick();
-            Preset p = SETTINGS::GetPreset(i);
+            Preset p = presets[i]; // SETTINGS::GetPreset(i);
             buttons[i].SetBaseColor(p.GetColor(), p.GetIntensity());
             buttons[i].SetAccentColor(p.GetColor(), p.GetIntensity());
             strip.SetPixelColor(i, buttons[i].GetLedColorState());
@@ -64,7 +69,8 @@ namespace Keypad
         time = millis();
 
         // For the first 3 second
-        while (!presetSelected && time - start < SETTINGS::GetPresetSelectTime() * 1000)
+        // while (!presetSelected && time - start < SETTINGS::GetPresetSelectTime() * 1000)
+        while (!presetSelected && time - start < 3000)
         {
             time = millis();
 
@@ -100,8 +106,8 @@ namespace Keypad
 
     bool SelectPreset(Preset preset)
     {
-        activePreset = preset;
-        activePreset.GetButtons(btnPresets);
+        activePreset = preset.GetId();
+        presets[activePreset].GetButtons(btnPresets);
 
         for (uint8_t i = 0; i < NUM_BUTTONS; i++)
         {
@@ -110,9 +116,9 @@ namespace Keypad
             buttons[i].SetBaseColor(btnPresets[i].baseColor, btnPresets[i].baseIntensity);
             buttons[i].SetAccentColor(btnPresets[i].accentColor, btnPresets[i].accentIntensity);
         }
-        buttons[activePreset.GetId()].Flash(5, 100);
+        buttons[presets[activePreset].GetId()].Flash(5, 100);
 
-        switch (activePreset.GetMode())
+        switch (presets[activePreset].GetMode())
         {
         case HwModes::KB_MODE:
             return setKeyboardMode();
@@ -151,7 +157,7 @@ namespace Keypad
     {
         if (action == KeyActions::ON)
         {
-            Preset p = SETTINGS::GetPreset(btn);
+            Preset p = presets[btn];//SETTINGS::GetPreset(btn);
             presetSelected = SelectPreset(p);
         }
     }
@@ -160,7 +166,7 @@ namespace Keypad
     {
         uint16_t key = btnPresets[btn].key;
 
-        switch (activePreset.GetMode())
+        switch (presets[activePreset].GetMode())
         {
         case KB_MODE:
             keyboardAction(key, action);

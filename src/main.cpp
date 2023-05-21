@@ -12,8 +12,8 @@ void setup()
   }
 
   presets[0].SetColor(BLUE, LED_HIGH_INT);
-  char *name = "MIDI";
-  presets[0].SetName(name, 5);
+  // char *name = "MIDI";
+  // presets[0].SetName(name, 5);
   presets[0].SetMode(HwModes::MIDI_MODE);
   BtnPreset btnPresets[NUM_BUTTONS];
 
@@ -26,7 +26,7 @@ void setup()
 
   presets[0].SetButtons(btnPresets);
 
-  Keypad::Init();
+  Keypad::Init(presets);
 }
 
 void loop()
