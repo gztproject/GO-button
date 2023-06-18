@@ -147,7 +147,7 @@ namespace Keypad
 
         if (time % 50 == 0 && lastMillis != time)
         {
-            // Serial.println(time);
+            Serial.println(time);
             strip.Show();
             lastMillis = time;
         }

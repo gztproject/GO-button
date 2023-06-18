@@ -6,7 +6,7 @@
 
 #include "config.h"
 
-#define PRESET_NAME_SIZE 128
+#define PRESET_NAME_SIZE 32
 
 typedef enum _HwModes : uint8_t
 {
@@ -25,15 +25,6 @@ typedef struct _BtnPreset
     uint8_t accentIntensity;
 } BtnPreset;
 
-// RgbColor red(255, 0, 0);
-// RgbColor green(0, 255, 0);
-// RgbColor blue(0, 0, 255);
-// RgbColor yellow(255, 255, 0);
-// RgbColor purple(255, 0, 255);
-// RgbColor cyan(0, 255, 255);
-// RgbColor white(255);
-// RgbColor black(0);
-
 #define RED RgbColor(255,0,0)
 #define GREEN RgbColor (0,255,0)
 #define BLUE RgbColor (0,0,255)
@@ -50,12 +41,12 @@ public:
     Preset() { Preset(0); };
     Preset(uint8_t id);
     Preset(uint8_t id, HwModes mode, BtnPreset *btnPresets, RgbColor color, uint8_t intensity);
-    //bool SetName(char *buf, size_t size);
+    bool SetName(char *buf, size_t size);
     void SetMode(HwModes mode);
     bool SetButtons(BtnPreset *btnPresets);
     void SetColor(RgbColor color, uint8_t intensity);
     uint8_t GetId() { return id; };
-    //size_t GetName(char *buf);
+    size_t GetName(char *buf);
     HwModes GetMode() { return mode; };
     size_t GetButtons(BtnPreset *btnPresets);
     RgbColor GetColor() { return color; };

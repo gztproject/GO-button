@@ -6,14 +6,22 @@ Preset presets[NUM_PRESETS];
 
 void setup()
 {
+  Serial.begin(115200);
+
+  while (!Serial.available())
+  {
+    delay(10);
+  }
+
   for (uint8_t i = 0; i < NUM_PRESETS; i++)
   {
+    Serial.print(".");
     presets[i] = Preset(i);
   }
 
   presets[0].SetColor(BLUE, LED_HIGH_INT);
-  // char *name = "MIDI";
-  // presets[0].SetName(name, 5);
+  char name[] = {'M', 'I', 'D', 'I'};
+  presets[0].SetName(name, 4);
   presets[0].SetMode(HwModes::MIDI_MODE);
   BtnPreset btnPresets[NUM_BUTTONS];
 
@@ -26,6 +34,7 @@ void setup()
 
   presets[0].SetButtons(btnPresets);
 
+  Serial.println("Initializing Keyboard!");
   Keypad::Init(presets);
 }
 
