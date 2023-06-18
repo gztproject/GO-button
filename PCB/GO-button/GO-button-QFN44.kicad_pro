@@ -56,18 +56,11 @@
         }
       ],
       "drc_exclusions": [
-        "courtyards_overlap|114730001|100000001|53d1f733-9e83-4aea-8bac-0d49590ecd35|5a38d90f-4eb9-4b40-85f7-28a77592d5f9",
-        "courtyards_overlap|114730001|76000001|a324e313-1969-4f3e-84f1-ed5d6cd5079c|d95bb7fe-fc36-46c4-91ed-37db76b929fb",
-        "courtyards_overlap|127730001|124000001|9fcc4557-44f5-4dc5-b556-fb6ae2f64ef4|22e62a8a-a778-4b90-b7a0-2ca31f8d57ad",
-        "courtyards_overlap|140230001|100000001|86bfef20-1302-4ec7-bead-482da746e687|f28882c0-bcb4-47da-8be2-2fe1f9643bdc",
-        "courtyards_overlap|140230001|76000001|57ec126e-60ba-4c02-9c06-2743090a143f|86d57de0-fa10-48ec-8a6b-b438fd3c9494",
+        "clearance|126454416|85131370|00647279-cf8b-436d-8c52-1eba50c53616|67ffd9af-f4c2-402f-b5d1-f7496bdc9dde",
         "courtyards_overlap|149079999|96600228|16818dd1-e95a-431c-9065-9948fcf582e1|f28882c0-bcb4-47da-8be2-2fe1f9643bdc",
         "silk_edge_clearance|124420000|59000000|e2e92711-5a52-41cb-b25e-97bb8ed9cde2|09947a5a-55b7-4f56-b2f5-fc1827cc31f7",
         "silk_edge_clearance|133580000|59000000|e2e92711-5a52-41cb-b25e-97bb8ed9cde2|7c5ce101-b14e-43dc-b150-ef934bbe11d2",
-        "starved_thermal|115316000|86162000|05f73569-26cb-489d-b4ee-4b8cd9851eb5|3dc62c8a-d660-416a-ac77-b7a99618af2d|F.Cu",
         "starved_thermal|117630000|84328000|05f73569-26cb-489d-b4ee-4b8cd9851eb5|cbe3f07b-42e9-4a55-81fc-c13d21bbf721|F.Cu",
-        "starved_thermal|121722000|79756000|05f73569-26cb-489d-b4ee-4b8cd9851eb5|aadadb45-42c4-43d9-95bb-a2655be7902a|F.Cu",
-        "starved_thermal|126750000|69010000|05f73569-26cb-489d-b4ee-4b8cd9851eb5|08a976c5-489d-4b94-89b5-1a7d80c20a44|F.Cu",
         "starved_thermal|129750000|69010000|05f73569-26cb-489d-b4ee-4b8cd9851eb5|e31c0b6f-5f06-4a63-a2b3-585549b042ab|F.Cu"
       ],
       "meta": {
