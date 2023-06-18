@@ -6,11 +6,11 @@ Preset presets[NUM_PRESETS];
 
 void setup()
 {
-  Serial.begin(115200);
+  //Serial.begin(115200);
 
   for (uint8_t i = 0; i < NUM_PRESETS; i++)
   {
-    Serial.print(".");
+    //Serial.print(".");
     presets[i] = Preset(i);
   }
 
@@ -200,7 +200,7 @@ void setup()
 
   presets[4].SetButtons(btnPresets);
 
-  Serial.println("Initializing Keyboard!");
+  //Serial.println("Initializing Keyboard!");
   Keypad::Init(presets);
 }
 

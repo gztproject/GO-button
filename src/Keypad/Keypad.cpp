@@ -106,21 +106,21 @@ namespace Keypad
 
     bool SelectPreset(Preset preset)
     {
-        Serial.print("Setting preset ");
-        char buf[32];
-        preset.GetName(buf);
-        Serial.print(buf);
-        Serial.println(": ");
+        // Serial.print("Setting preset ");
+        // char buf[32];
+        // preset.GetName(buf);
+        // Serial.print(buf);
+        // Serial.println(": ");
 
         activePreset = preset.GetId();
         presets[activePreset].GetButtons(btnPresets);
 
         for (uint8_t i = 0; i < NUM_BUTTONS; i++)
         {
-            Serial.print("B");
-            Serial.print(i);
-            Serial.print(": ");
-            Serial.println(btnPresets[i].key);
+            // Serial.print("B");
+            // Serial.print(i);
+            // Serial.print(": ");
+            // Serial.println(btnPresets[i].key);
             buttons[i].FlashOff();
             buttons[i].SetCallback(KeypadAction);
             buttons[i].SetBaseColor(btnPresets[i].baseColor, btnPresets[i].baseIntensity);
