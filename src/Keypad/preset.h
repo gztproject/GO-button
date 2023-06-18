@@ -39,12 +39,12 @@ class Preset
 {
 public:
     Preset() { Preset(0); };
-    Preset(uint8_t id);
-    Preset(uint8_t id, HwModes mode, BtnPreset *btnPresets, RgbColor color, uint8_t intensity);
+    Preset(uint8_t _id);
+    Preset(uint8_t _id, HwModes _mode, BtnPreset *btnPresets, RgbColor _color, uint8_t _intensity);
     bool SetName(char *buf, size_t size);
-    void SetMode(HwModes mode);
+    void SetMode(HwModes _mode);
     bool SetButtons(BtnPreset *btnPresets);
-    void SetColor(RgbColor color, uint8_t intensity);
+    void SetColor(RgbColor _color, uint8_t _intensity);
     uint8_t GetId() { return id; };
     size_t GetName(char *buf);
     HwModes GetMode() { return mode; };

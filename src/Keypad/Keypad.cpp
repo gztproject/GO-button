@@ -40,7 +40,7 @@ namespace Keypad
         {
             presets[i] = pres[i];
         }
-        activePreset = 0; // SETTINGS::GetActivePreset();
+        activePreset = 3; // SETTINGS::GetActivePreset();
 
         Button buttons[NUM_BUTTONS] = {
             Button(0, BTN_0_PIN, BLACK, 0, PresetCallback),
@@ -106,11 +106,21 @@ namespace Keypad
 
     bool SelectPreset(Preset preset)
     {
+        Serial.print("Setting preset ");
+        char buf[32];
+        preset.GetName(buf);
+        Serial.print(buf);
+        Serial.println(": ");
+
         activePreset = preset.GetId();
         presets[activePreset].GetButtons(btnPresets);
 
         for (uint8_t i = 0; i < NUM_BUTTONS; i++)
         {
+            Serial.print("B");
+            Serial.print(i);
+            Serial.print(": ");
+            Serial.println(btnPresets[i].key);
             buttons[i].FlashOff();
             buttons[i].SetCallback(KeypadAction);
             buttons[i].SetBaseColor(btnPresets[i].baseColor, btnPresets[i].baseIntensity);
@@ -147,7 +157,7 @@ namespace Keypad
 
         if (time % 50 == 0 && lastMillis != time)
         {
-            Serial.println(time);
+            //Serial.println(time);
             strip.Show();
             lastMillis = time;
         }
