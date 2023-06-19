@@ -2,42 +2,45 @@
 
 // #pragma region Public
 
-Preset::Preset(uint8_t id)
+Preset::Preset(uint8_t _id)
 {
-    Preset::id = id;
-    //name[0] = '\0';
+    id = _id;
+    name[0] = '\0';
     mode = UNKNOWN;
     color = BLACK;
     intensity = 0;
     clearActions();
 }
 
-Preset::Preset(uint8_t id, HwModes mode, BtnPreset *btnPresets, RgbColor color, uint8_t intensity)
+Preset::Preset(uint8_t _id, HwModes _mode, BtnPreset *btnPresets, RgbColor _color, uint8_t _intensity)
 {
-    Preset::id = id;
-    //name[0] = '\0';
-    Preset::mode = mode;
-    Preset::color = color;
-    Preset::intensity = intensity;
-    
+    id = _id;
+    name[0] = '\0';
+    mode = _mode;
+    color = _color;
+    intensity = _intensity;
+
     SetButtons(btnPresets);
 }
 
-// bool Preset::SetName(char *buf, size_t size)
-// {
-//     if (size > PRESET_NAME_SIZE)
-//         return false;
-
-//     for (uint8_t i = 0; i < size; i++)
-//     {
-//         name[i] = buf[i];
-//     }
-//     return true;
-// }
-
-void Preset::SetMode(HwModes mode)
+bool Preset::SetName(char *buf, size_t size)
 {
-    Preset::mode = mode;
+    if (size >= PRESET_NAME_SIZE)
+        return false;
+
+    uint8_t i;
+    for (i = 0; i < size; i++)
+    {
+        name[i] = buf[i];
+    }
+    name[i] = '\0';
+    
+    return true;
+}
+
+void Preset::SetMode(HwModes _mode)
+{
+    mode = _mode;
 
     clearActions();
 }
@@ -46,35 +49,35 @@ bool Preset::SetButtons(BtnPreset *btnPresets)
 {
     for (uint8_t i = 0; i < NUM_BUTTONS; i++)
     {
-        Preset::btnPreset[i] = btnPreset[i];
+        btnPreset[i] = btnPresets[i];
     }
     return true;
 }
 
-void Preset::SetColor(RgbColor color, uint8_t intensity)
+void Preset::SetColor(RgbColor _color, uint8_t _intensity)
 {
-    Preset::color = color;
-    Preset::intensity = intensity;
+    color = _color;
+    intensity = _intensity;
 }
 
-// size_t Preset::GetName(char *buf)
-// {
-//     size_t i;
-//     for (i = 0; i < PRESET_NAME_SIZE; i++)
-//     {
-//         buf[i] = name[i];
-//         if (name[i] == '\0')
-//             return i;
-//     }
-//     return i;
-// }
+size_t Preset::GetName(char *buf)
+{
+    size_t i;
+    for (i = 0; i < PRESET_NAME_SIZE; i++)
+    {
+        buf[i] = name[i];
+        if (name[i] == '\0')
+            return i;
+    }
+    return i;
+}
 
-size_t Preset::GetButtons(BtnPreset *BtnPreset)
+size_t Preset::GetButtons(BtnPreset *btnPresets)
 {
     size_t i;
     for (i = 0; i < NUM_BUTTONS; i++)
     {
-        btnPreset[i] = Preset::btnPreset[i];
+        btnPresets[i] = btnPreset[i];
     }
     return i;
 }

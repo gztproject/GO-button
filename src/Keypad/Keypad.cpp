@@ -40,14 +40,13 @@ namespace Keypad
         {
             presets[i] = pres[i];
         }
-        activePreset = 0; // SETTINGS::GetActivePreset();
+        activePreset = 2; // SETTINGS::GetActivePreset();
 
-        Button buttons[NUM_BUTTONS] = {
-            Button(0, BTN_0_PIN, BLACK, 0, PresetCallback),
-            Button(1, BTN_1_PIN, BLACK, 0, PresetCallback),
-            Button(2, BTN_2_PIN, BLACK, 0, PresetCallback),
-            Button(3, BTN_3_PIN, BLACK, 0, PresetCallback),
-            Button(4, BTN_4_PIN, BLACK, 0, PresetCallback)};
+        buttons[0] = Button(0, BTN_0_PIN, BLACK, 0, PresetCallback);
+        buttons[1] = Button(1, BTN_1_PIN, BLACK, 0, PresetCallback);
+        buttons[2] = Button(2, BTN_2_PIN, BLACK, 0, PresetCallback);
+        buttons[3] = Button(3, BTN_3_PIN, BLACK, 0, PresetCallback);
+        buttons[4] = Button(4, BTN_4_PIN, BLACK, 0, PresetCallback);
 
         presetSelected = false;
         // this resets all the neopixels to an off state
@@ -77,11 +76,14 @@ namespace Keypad
             for (uint8_t i = 0; i < NUM_BUTTONS; i++)
             {
                 buttons[i].Tick();
-                strip.SetPixelColor(i, buttons[i].GetLedColorState());
             }
 
             if (time % 50 == 0 && lastMillis != time)
             {
+                for (uint8_t i = 0; i < NUM_BUTTONS; i++)
+                {
+                    strip.SetPixelColor(i, buttons[i].GetLedColorState());
+                }
                 // Serial.println(time);
                 strip.Show();
                 lastMillis = time;
@@ -106,17 +108,29 @@ namespace Keypad
 
     bool SelectPreset(Preset preset)
     {
+        // Serial.print("Setting preset ");
+        // char buf[16];
+        // preset.GetName(buf);
+        // Serial.print(buf);
+        // Serial.println(": ");
+
         activePreset = preset.GetId();
         presets[activePreset].GetButtons(btnPresets);
 
         for (uint8_t i = 0; i < NUM_BUTTONS; i++)
         {
+            // Serial.print("\tB");
+            // Serial.print(i);
+            // Serial.print(": ");
+            // Serial.println(btnPresets[i].key);
             buttons[i].FlashOff();
             buttons[i].SetCallback(KeypadAction);
             buttons[i].SetBaseColor(btnPresets[i].baseColor, btnPresets[i].baseIntensity);
             buttons[i].SetAccentColor(btnPresets[i].accentColor, btnPresets[i].accentIntensity);
+            buttons[i].LedBase();
         }
-        buttons[presets[activePreset].GetId()].Flash(5, 100);
+
+        buttons[activePreset].Flash(5, 100);
 
         switch (presets[activePreset].GetMode())
         {
@@ -139,15 +153,17 @@ namespace Keypad
     {
         time = millis();
 
-        for (uint8_t i = 0; i < 5; i++)
+        for (uint8_t i = 0; i < NUM_BUTTONS; i++)
         {
             buttons[i].Tick();
-            strip.SetPixelColor(i, buttons[i].GetLedColorState());
         }
 
         if (time % 50 == 0 && lastMillis != time)
         {
-            // Serial.println(time);
+            for (uint8_t i = 0; i < NUM_BUTTONS; i++)
+            {
+                strip.SetPixelColor(i, buttons[i].GetLedColorState());
+            }
             strip.Show();
             lastMillis = time;
         }
@@ -157,7 +173,7 @@ namespace Keypad
     {
         if (action == KeyActions::ON)
         {
-            Preset p = presets[btn];//SETTINGS::GetPreset(btn);
+            Preset p = presets[btn];
             presetSelected = SelectPreset(p);
         }
     }
@@ -165,6 +181,13 @@ namespace Keypad
     void KeypadAction(uint8_t btn, KeyActions action)
     {
         uint16_t key = btnPresets[btn].key;
+
+        // Serial.print("Callback: BTN");
+        // Serial.print(btn);
+        // Serial.print(": ");
+        // Serial.print(key);
+        // Serial.print(" -> ");
+        // Serial.println(action);
 
         switch (presets[activePreset].GetMode())
         {
