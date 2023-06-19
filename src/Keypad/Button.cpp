@@ -10,61 +10,64 @@ Button::Button()
     baseIntensity = 0;
     accentColor = BLACK;
     accentIntensity = 0;
-    ledColorState = BLACK;
-    callback = {};    
+    ledColorState = BLACK;    
+    callback = {};
+    pinMode(btnPin, INPUT_PULLUP);
 }
 
-Button::Button(uint8_t id, uint8_t btn, RgbColor col, uint8_t ledInt, void (*callback)(uint8_t i, KeyActions action))
+Button::Button(uint8_t _id, uint8_t btn, RgbColor col, uint8_t ledInt, void (*_callback)(uint8_t i, KeyActions action))
 {
-    Button::id = id;
+    id = _id;
     btnPin = btn;
     baseColor = col;
     baseIntensity = ledInt;
     accentColor = col;
     accentIntensity = ledInt;
     ledColorState = BLACK;
-    Button::callback = callback;
+    callback = _callback;
     pinMode(btnPin, INPUT_PULLUP);
     LedOff();
 }
 
-Button::Button(uint8_t id, uint8_t btn, RgbColor bCol, uint8_t bInt, RgbColor aCol, uint8_t aInt, void (*callback)(uint8_t i, KeyActions action))
+Button::Button(uint8_t _id, uint8_t btn, RgbColor bCol, uint8_t bInt, RgbColor aCol, uint8_t aInt, void (*_callback)(uint8_t i, KeyActions action))
 {
-    Button::id = id;
+    id = _id;
     btnPin = btn;
     baseColor = bCol;
     baseIntensity = bInt;
     accentColor = aCol;
     accentIntensity = aInt;
     ledColorState = BLACK;
-    Button::callback = callback;    
+    callback = _callback;
     pinMode(btnPin, INPUT_PULLUP);
     LedOff();
 }
 
-void Button::SetCallback(void (*callback)(uint8_t i, KeyActions action))
+void Button::SetCallback(void (*_callback)(uint8_t i, KeyActions action))
 {
-    Button::callback = callback; 
+    callback = _callback;
 }
 
 void Button::Tick()
 {
-    unsigned long time = millis();
-    bool newState = (digitalRead(btnPin) == LOW);
-
+    unsigned long time = millis();    
+    bool newState = (digitalRead(btnPin) == LOW);    
+    
     // Button state changed for enough time (DEBOUNCE_TIME)
     if (oldState != newState && (time - lastChangeMillis > DEBOUNCE_TIME))
     {
         oldState = newState;
         lastChangeMillis = time;
-
+        //Serial.print("Keypress: ");
         if (newState)
         {
+            //Serial.println("ON");
             LedAccent();
             callback(id, KeyActions::ON);
         }
         else
         {
+            //Serial.println("OFF");
             if ((ledIntensityState > baseIntensity) && flashingSpeed == 0)
                 LedBase();
             callback(id, KeyActions::OFF);

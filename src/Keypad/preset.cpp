@@ -25,13 +25,16 @@ Preset::Preset(uint8_t _id, HwModes _mode, BtnPreset *btnPresets, RgbColor _colo
 
 bool Preset::SetName(char *buf, size_t size)
 {
-    if (size > PRESET_NAME_SIZE)
+    if (size >= PRESET_NAME_SIZE)
         return false;
 
-    for (uint8_t i = 0; i < size; i++)
+    uint8_t i;
+    for (i = 0; i < size; i++)
     {
         name[i] = buf[i];
     }
+    name[i] = '\0';
+    
     return true;
 }
 

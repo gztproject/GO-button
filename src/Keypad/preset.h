@@ -6,7 +6,7 @@
 
 #include "config.h"
 
-#define PRESET_NAME_SIZE 32
+#define PRESET_NAME_SIZE 16
 
 typedef enum _HwModes : uint8_t
 {
