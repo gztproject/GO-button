@@ -6,12 +6,24 @@ Custom boards can also be defined from scratch or by overriding settings of exis
 
 ## Contents
 
-* [JSON Structure](#json-structure)
-* [Installation](#installation)
-* [Examples](#examples)
-* [File locations](#file-locations)
+* [Sources](#sources)
+* [Board definition](#board-definition)
+	* [JSON Structure](#json-structure)
+	* [Installation](#installation)
+	* [Examples](#examples)
+	* [File locations](#file-locations)
+* [Custom Variant](#custom-variant)
 
-## JSON Structure {#json-structure}
+## Sources {#sources}
+
+* [https://docs.platformio.org/en/stable/platforms/creating_board.html](https://docs.platformio.org/en/stable/projectconf/sections/platformio/options/directory/boards_dir.html#projectconf-pio-boards-dir)
+* [https://docs.platformio.org/en/stable/projectconf/sections/platformio/options/directory/boards_dir.html#projectconf-pio-boards-dir](https://docs.platformio.org/en/stable/projectconf/sections/platformio/options/directory/boards_dir.html#projectconf-pio-boards-dir)
+* [https://github.com/platformio/platform-atmelsam/pull/74](https://docs.platformio.org/en/stable/projectconf/sections/platformio/options/directory/boards_dir.html#projectconf-pio-boards-dir)
+
+
+## Board definition {#board-definition}
+
+### JSON Structure {#json-structure}
 
 The key fields are:
 
@@ -51,7 +63,7 @@ For details, see existing boards as examples, available under `.platformio/platf
 }
 ```
 
-## Installation {#installation}
+### Installation {#installation}
 
 * Create boards directory in core_dir if it doesn’t exist.
 * Create myboard.json file in this boards directory.
@@ -59,15 +71,15 @@ For details, see existing boards as examples, available under `.platformio/platf
 
 Now, you can use myboard for the board option in “platformio.ini” (Project Configuration File).
 
-### Note
+#### Note
 
 You can have custom boards per project. In this case, please put your board’s JSON files to boards_dir[].
 
-## Examples {#examples}
+### Examples {#examples}
 
 Please take a look at the source code of PlatformIO Development Platforms and navigate to boards folder of the repository.
 
-## File locations {#file-locations}
+### File locations {#file-locations}
 
 The location of project-specific board definitions. Each project may choose a suitable directory name. The default value is boards, meaning a “boards” directory located in the root of the project.
 
@@ -78,3 +90,27 @@ By default, PlatformIO looks for boards in this order:
 * Development platform `core_dir/platforms/*/boards.`
 
 This option can also be configured by the global environment variable PLATFORMIO_BOARDS_DIR.
+
+## Custom Variant {#custom-variant}
+
+In case a board needs to override the `arduino-pins.h` file, it should be put in a folder with the variant name.
+In this case it is configured to look for the custom variant in a subfolder of the `boards` directory:
+
+``` ini
+[env:gztgobutton]
+...
+board_build.variant = customVariantName
+board_build.variants_dir = boards
+...
+```
+See [GitHub](https://github.com/platformio/platform-atmelsam/pull/74):
+
+How about if we add support for board_build.variants_dir? Then you can create in your project custom_variants and later use in platformio.ini:
+
+``` ini
+[env:myenv]
+board_build.variant = feather0custom
+board_build.variants_dir = custom_variants
+```
+
+It will automatically find custom_variants in a project root. A relative path is OK.
