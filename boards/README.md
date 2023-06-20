@@ -66,14 +66,14 @@ For details, see existing boards as examples, available under `.platformio/platf
 ### Installation {#installation}
 
 * Create boards directory in core_dir if it doesn’t exist.
-* Create myboard.json file in this boards directory.
+* Create `myboard.json` file in this boards directory.
 * Search available boards via pio boards command. You should see myboard board.
 
-Now, you can use myboard for the board option in “platformio.ini” (Project Configuration File).
+Now, you can use myboard for the board option in `platformio.ini` (Project Configuration File).
 
 #### Note
 
-You can have custom boards per project. In this case, please put your board’s JSON files to boards_dir[].
+You can have custom boards per project. In this case, please put your board’s JSON files to [boards_dir](#file-locations).
 
 ### Examples {#examples}
 
@@ -96,7 +96,10 @@ This option can also be configured by the global environment variable PLATFORMIO
 In case a board needs to override the `arduino-pins.h` file, it should be put in a folder with the variant name.
 In this case it is configured to look for the custom variant in a subfolder of the `boards` directory:
 
+
 ``` ini
+;platformio.ini
+
 [env:gztgobutton]
 ...
 board_build.variant = customVariantName
@@ -108,9 +111,13 @@ See [GitHub](https://github.com/platformio/platform-atmelsam/pull/74):
 How about if we add support for board_build.variants_dir? Then you can create in your project custom_variants and later use in platformio.ini:
 
 ``` ini
+;platformio.ini
+
 [env:myenv]
+...
 board_build.variant = feather0custom
 board_build.variants_dir = custom_variants
+...
 ```
 
 It will automatically find custom_variants in a project root. A relative path is OK.
