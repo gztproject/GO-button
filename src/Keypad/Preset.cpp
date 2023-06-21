@@ -1,6 +1,15 @@
-#include "preset.h"
+/**
+ * @file Preset.cpp
+ * @author Gašper Doljak (info@gzt.si)
+ * @brief A Preset class that defines the keypad behaviour
+ * @version 2.0.1
+ * @date 2023-06-21
+ * 
+ * 
+ */
+#include "Preset.h"
 
-// #pragma region Public
+#pragma region Public
 
 Preset::Preset(uint8_t _id)
 {
@@ -12,7 +21,7 @@ Preset::Preset(uint8_t _id)
     clearActions();
 }
 
-Preset::Preset(uint8_t _id, HwModes _mode, BtnPreset *btnPresets, RgbColor _color, uint8_t _intensity)
+Preset::Preset(uint8_t _id, HwMode _mode, BtnPreset *btnPresets, RgbColor _color, uint8_t _intensity)
 {
     id = _id;
     name[0] = '\0';
@@ -38,7 +47,7 @@ bool Preset::SetName(char *buf, size_t size)
     return true;
 }
 
-void Preset::SetMode(HwModes _mode)
+void Preset::SetMode(HwMode _mode)
 {
     mode = _mode;
 
@@ -82,8 +91,8 @@ size_t Preset::GetButtons(BtnPreset *btnPresets)
     return i;
 }
 
-// #pragma endregion Public
-// #pragma region Private
+#pragma endregion Public
+#pragma region Private
 
 void Preset::clearActions()
 {
@@ -93,4 +102,4 @@ void Preset::clearActions()
     }
 }
 
-// #pragma endregion Private
+#pragma endregion Private

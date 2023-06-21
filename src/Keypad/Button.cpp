@@ -1,3 +1,12 @@
+/**
+ * @file Button.cpp
+ * @author Gašper Doljak (info@gzt.si)
+ * @brief All the button logic and variables
+ * @version 2.0.1
+ * @date 2023-06-21
+ * 
+ * 
+ */
 #ifndef BUTTON_C
 #define BUTTON_C
 #include "Button.h"
@@ -15,10 +24,10 @@ Button::Button()
     pinMode(btnPin, INPUT_PULLUP);
 }
 
-Button::Button(uint8_t _id, uint8_t btn, RgbColor col, uint8_t ledInt, void (*_callback)(uint8_t i, KeyActions action))
+Button::Button(uint8_t _id, uint8_t pin, RgbColor col, uint8_t ledInt, void (*_callback)(uint8_t i, KeyActions action))
 {
     id = _id;
-    btnPin = btn;
+    btnPin = pin;
     baseColor = col;
     baseIntensity = ledInt;
     accentColor = col;
@@ -29,10 +38,10 @@ Button::Button(uint8_t _id, uint8_t btn, RgbColor col, uint8_t ledInt, void (*_c
     LedOff();
 }
 
-Button::Button(uint8_t _id, uint8_t btn, RgbColor bCol, uint8_t bInt, RgbColor aCol, uint8_t aInt, void (*_callback)(uint8_t i, KeyActions action))
+Button::Button(uint8_t _id, uint8_t pin, RgbColor bCol, uint8_t bInt, RgbColor aCol, uint8_t aInt, void (*_callback)(uint8_t i, KeyActions action))
 {
     id = _id;
-    btnPin = btn;
+    btnPin = pin;
     baseColor = bCol;
     baseIntensity = bInt;
     accentColor = aCol;
@@ -105,12 +114,6 @@ void Button::LedOn(RgbColor color, uint8_t intensity)
 {
     ledColorState = color.Dim(intensity);
     ledIntensityState = intensity;
-}
-
-/** @deprecated */
-void Button::LedDimm()
-{
-    LedBase();
 }
 
 void Button::LedBase()
