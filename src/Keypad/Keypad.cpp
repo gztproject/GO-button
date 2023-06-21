@@ -1,11 +1,18 @@
+/**
+ * @file Keypad.cpp
+ * @author Gašper Doljak (info@gzt.si)
+ * @brief A Keypad "static class"
+ * @version 2.0.1
+ * @date 2023-06-21
+ *
+ *
+ */
 #include "Keypad.h"
-
 #include <NeoPixelBus.h>
 
 namespace Keypad
 {
-
-    // #pragma region private defs
+#pragma region private defs
 
     unsigned long start;
     unsigned long lastMillis;
@@ -18,29 +25,89 @@ namespace Keypad
 
     NeoPixelBus<NeoGrbFeature, NeoWs2812Method> strip(NUM_BUTTONS, LED_PIN);
 
+    /**
+     * @brief Set keypad mode to KB
+     *
+     * @return true
+     */
     bool setKeyboardMode();
+
+    /**
+     * @brief Set keypad mode to HID
+     *
+     * @return true
+     */
     bool setHidMode();
+
+    /**
+     * @brief Set keypad mode to MIDI
+     *
+     * @return true
+     */
     bool setMidiMode();
 
+    /**
+     * @brief Sends the keystroke to the host
+     *
+     * @param key A key to send
+     * @param action ON/OFF/PRESS
+     */
     void keyboardAction(uint8_t key, KeyActions action);
+
+    /**
+     * @brief Sends the HID keystroke to the host
+     *
+     * @param key A key to send
+     * @param action ON/OFF/PRESS
+     */
     void hidAction(ConsumerKeycode key, KeyActions action);
+
+    /**
+     * @brief Calls the MIDI wrapper to send the note
+     *
+     * @param key A note to send
+     * @param action ON/OFF
+     */
     void midiAction(uint8_t key, KeyActions action);
 
+    /**
+     * @brief Actually sends the _noteOn_
+     * 
+     * @param channel MIDI channel
+     * @param pitch MIDI note (pitch)
+     * @param velocity MIDI velocity
+     */
     void midiNoteOn(byte channel, byte pitch, byte velocity);
+
+     /**
+     * @brief Actually sends the _noteOff_
+     * 
+     * @param channel MIDI channel
+     * @param pitch MIDI note (pitch)
+     * @param velocity MIDI velocity
+     */
     void midiNoteOff(byte channel, byte pitch, byte velocity);
+
+     /**
+     * @brief Actually sends the _controlChange_
+     * 
+     * @param channel MIDI channel
+     * @param control MIDI control
+     * @param value MIDI control value
+     */
     void midiControlChange(byte channel, byte control, byte value);
 
-    // #pragma endregion private defs
+#pragma endregion private defs
 
-    // #pragma region Public
+#pragma region Public
 
-    bool Init(Preset *pres)
+    bool Init(Preset *pres, uint8_t defaultId, uint16_t presetTimeout)
     {
         for (uint8_t i = 0; i < NUM_PRESETS; i++)
         {
             presets[i] = pres[i];
         }
-        activePreset = 2; // SETTINGS::GetActivePreset();
+        activePreset = defaultId;
 
         buttons[0] = Button(0, BTN_0_PIN, BLACK, 0, PresetCallback);
         buttons[1] = Button(1, BTN_1_PIN, BLACK, 0, PresetCallback);
@@ -55,7 +122,7 @@ namespace Keypad
         for (uint8_t i = 0; i < NUM_BUTTONS; i++)
         {
             buttons[i].Tick();
-            Preset p = presets[i]; // SETTINGS::GetPreset(i);
+            Preset p = presets[i];
             buttons[i].SetBaseColor(p.GetColor(), p.GetIntensity());
             buttons[i].SetAccentColor(p.GetColor(), p.GetIntensity());
             strip.SetPixelColor(i, buttons[i].GetLedColorState());
@@ -67,9 +134,8 @@ namespace Keypad
         lastMillis = millis();
         time = millis();
 
-        // For the first 3 second
-        // while (!presetSelected && time - start < SETTINGS::GetPresetSelectTime() * 1000)
-        while (!presetSelected && time - start < 3000)
+        // For the first 3 second        
+        while (!presetSelected && time - start < presetTimeout)
         {
             time = millis();
 
@@ -78,13 +144,12 @@ namespace Keypad
                 buttons[i].Tick();
             }
 
-            if (time % 50 == 0 && lastMillis != time)
+            if (time % LED_UPDATE_INTERVAL == 0 && lastMillis != time)
             {
                 for (uint8_t i = 0; i < NUM_BUTTONS; i++)
                 {
                     strip.SetPixelColor(i, buttons[i].GetLedColorState());
                 }
-                // Serial.println(time);
                 strip.Show();
                 lastMillis = time;
             }
@@ -108,21 +173,25 @@ namespace Keypad
 
     bool SelectPreset(Preset preset)
     {
-        // Serial.print("Setting preset ");
-        // char buf[16];
-        // preset.GetName(buf);
-        // Serial.print(buf);
-        // Serial.println(": ");
+#if defined(KEYPAD_DEBUG) & KEYPAD_DEBUG > 0
+        Serial.print("Setting preset ");
+        char buf[16];
+        preset.GetName(buf);
+        Serial.print(buf);
+        Serial.println(": ");
+#endif
 
         activePreset = preset.GetId();
         presets[activePreset].GetButtons(btnPresets);
 
         for (uint8_t i = 0; i < NUM_BUTTONS; i++)
         {
-            // Serial.print("\tB");
-            // Serial.print(i);
-            // Serial.print(": ");
-            // Serial.println(btnPresets[i].key);
+#if defined(KEYPAD_DEBUG) & KEYPAD_DEBUG > 0
+            Serial.print("\tB");
+            Serial.print(i);
+            Serial.print(": ");
+            Serial.println(btnPresets[i].key);
+#endif
             buttons[i].FlashOff();
             buttons[i].SetCallback(KeypadAction);
             buttons[i].SetBaseColor(btnPresets[i].baseColor, btnPresets[i].baseIntensity);
@@ -134,13 +203,13 @@ namespace Keypad
 
         switch (presets[activePreset].GetMode())
         {
-        case HwModes::KB_MODE:
+        case HwMode::KB_MODE:
             return setKeyboardMode();
             break;
-        case HwModes::HID_MODE:
+        case HwMode::HID_MODE:
             return setHidMode();
             break;
-        case HwModes::MIDI_MODE:
+        case HwMode::MIDI_MODE:
             return setMidiMode();
             break;
         default:
@@ -158,7 +227,7 @@ namespace Keypad
             buttons[i].Tick();
         }
 
-        if (time % 50 == 0 && lastMillis != time)
+        if (time % LED_UPDATE_INTERVAL == 0 && lastMillis != time)
         {
             for (uint8_t i = 0; i < NUM_BUTTONS; i++)
             {
@@ -182,12 +251,14 @@ namespace Keypad
     {
         uint16_t key = btnPresets[btn].key;
 
-        // Serial.print("Callback: BTN");
-        // Serial.print(btn);
-        // Serial.print(": ");
-        // Serial.print(key);
-        // Serial.print(" -> ");
-        // Serial.println(action);
+#if defined(KEYPAD_DEBUG) & KEYPAD_DEBUG > 0
+        Serial.print("Callback: BTN");
+        Serial.print(btn);
+        Serial.print(": ");
+        Serial.print(key);
+        Serial.print(" -> ");
+        Serial.println(action);
+#endif
 
         switch (presets[activePreset].GetMode())
         {
@@ -205,9 +276,9 @@ namespace Keypad
         }
     }
 
-    // #pragma endregion Public
+#pragma endregion Public
 
-    // #pragma region Private
+#pragma region Private
 
     bool setKeyboardMode()
     {
@@ -305,6 +376,5 @@ namespace Keypad
         }
         MidiUSB.flush();
     }
+#pragma endregion Private
 }
-
-// #pragma endregion Private

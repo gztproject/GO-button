@@ -18,7 +18,7 @@
 //Preset 0
 #define P0_COL GREEN
 #define P0_NAME "MIDI"
-#define P0_MODE HwModes::MIDI_MODE
+#define P0_MODE HwMode::MIDI_MODE
 #define P0B0_KEY 47
 #define P0B0_COL BLUE
 #define P0B1_KEY 48
@@ -34,7 +34,7 @@
 //Preset 1
 #define P1_COL RED
 #define P1_NAME "KEYBOARD"
-#define P1_MODE HwModes::KB_MODE
+#define P1_MODE HwMode::KB_MODE
 #define P1B0_KEY KEY_UP_ARROW
 #define P1B0_COL BLUE
 #define P1B1_KEY KEY_DOWN_ARROW
@@ -49,7 +49,7 @@
 //Preset 2
 #define P2_COL PURPLE
 #define P2_NAME "HID"
-#define P2_MODE HwModes::HID_MODE
+#define P2_MODE HwMode::HID_MODE
 #define P2B0_KEY MEDIA_VOL_DOWN
 #define P2B0_COL BLUE
 #define P2B1_KEY MEDIA_VOL_UP
@@ -64,7 +64,7 @@
 //Preset 3
 #define P3_COL PURPLE
 #define P3_NAME "HID"
-#define P3_MODE HwModes::HID_MODE
+#define P3_MODE HwMode::HID_MODE
 #define P3B0_KEY MEDIA_VOL_DOWN
 #define P3B0_COL BLUE
 #define P3B1_KEY MEDIA_VOL_UP
@@ -79,7 +79,7 @@
 //Preset 4
 #define P4_COL PURPLE
 #define P4_NAME "HID"
-#define P4_MODE HwModes::HID_MODE
+#define P4_MODE HwMode::HID_MODE
 #define P4B0_KEY MEDIA_VOL_DOWN
 #define P4B0_COL BLUE
 #define P4B1_KEY MEDIA_VOL_UP
