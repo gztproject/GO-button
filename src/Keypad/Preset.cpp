@@ -54,11 +54,11 @@ void Preset::SetMode(HwMode _mode)
     clearActions();
 }
 
-bool Preset::SetButtons(BtnPreset *btnPresets)
+bool Preset::SetButtons(BtnPreset *_btnPresets)
 {
     for (uint8_t i = 0; i < NUM_BUTTONS; i++)
     {
-        btnPresets[i] = btnPresets[i];
+        btnPresets[i] = _btnPresets[i];
     }
     return true;
 }
@@ -81,12 +81,12 @@ size_t Preset::GetName(char *buf)
     return i;
 }
 
-size_t Preset::GetButtons(BtnPreset *btnPresets)
+size_t Preset::GetButtons(BtnPreset *_btnPresets)
 {
     size_t i;
     for (i = 0; i < NUM_BUTTONS; i++)
     {
-        btnPresets[i] = btnPresets[i];
+        _btnPresets[i] = btnPresets[i];
     }
     return i;
 }
@@ -94,6 +94,13 @@ size_t Preset::GetButtons(BtnPreset *btnPresets)
 bool Preset::Save()
 {
     int address = EEPROM_START_ADDRESS + (id * PRESET_EEPROM_LENGTH);
+
+#if defined(PRESET_DEBUG) & PRESET_DEBUG > 0
+    Serial.print("\tID: ");
+    Serial.println(id);
+    Serial.print("\tStarting W address: ");
+    Serial.println(address);
+#endif
 
     EEPROM.update(address++, id);
     for (uint8_t i = 0; i < PRESET_NAME_SIZE; i++)
@@ -104,6 +111,12 @@ bool Preset::Save()
 
     for (uint8_t i = 0; i < NUM_BUTTONS; i++)
     {
+#if defined(PRESET_DEBUG) & PRESET_DEBUG > 0
+        Serial.print("\t\tBTN ");
+        Serial.print(i);
+        Serial.print(": ");
+        Serial.println(btnPresets[i].key);
+#endif
         EEPROM.update(address++, highByte(btnPresets[i].key));
         EEPROM.update(address++, lowByte(btnPresets[i].key));
         EEPROM.update(address++, btnPresets[i].baseColor.R);
@@ -120,11 +133,25 @@ bool Preset::Save()
     EEPROM.update(address++, color.G);
     EEPROM.update(address++, color.B);
     EEPROM.update(address++, intensity);
+
+#if defined(PRESET_DEBUG) & PRESET_DEBUG > 0
+    Serial.print("\tLast W address: ");
+    Serial.println(address - 1);
+
+    Serial.print("\tW length: ");
+    Serial.println((address - 1) - (EEPROM_START_ADDRESS + (id * PRESET_EEPROM_LENGTH)));
+#endif
 }
 
 bool Preset::Recall()
 {
-    int address = EEPROM_START_ADDRESS + (id * PRESET_EEPROM_LENGTH);
+    uint16_t address = EEPROM_START_ADDRESS + (id * PRESET_EEPROM_LENGTH);
+#if defined(PRESET_DEBUG) & PRESET_DEBUG > 0
+    Serial.print("\tID: ");
+    Serial.println(id);
+    Serial.print("\tStarting R address: ");
+    Serial.println(address);
+#endif
 
     uint8_t _id = EEPROM.read(address++);
 
@@ -146,6 +173,12 @@ bool Preset::Recall()
     {
         btnPresets[i].key = EEPROM.read(address++) << 8;
         btnPresets[i].key |= EEPROM.read(address++);
+#if defined(PRESET_DEBUG) & PRESET_DEBUG > 0
+        Serial.print("\t\tBTN ");
+        Serial.print(i);
+        Serial.print(": ");
+        Serial.println(btnPresets[i].key);
+#endif
         btnPresets[i].baseColor.R = EEPROM.read(address++);
         btnPresets[i].baseColor.G = EEPROM.read(address++);
         btnPresets[i].baseColor.B = EEPROM.read(address++);
@@ -160,6 +193,14 @@ bool Preset::Recall()
     color.G = EEPROM.read(address++);
     color.B = EEPROM.read(address++);
     intensity = EEPROM.read(address++);
+
+#if defined(PRESET_DEBUG) & PRESET_DEBUG > 0
+    Serial.print("\tLast R address: ");
+    Serial.println(address - 1);
+
+    Serial.print("\tR length: ");
+    Serial.println((address - 1) - (EEPROM_START_ADDRESS + (id * PRESET_EEPROM_LENGTH)));
+#endif
 }
 
 #pragma endregion Public

@@ -16,7 +16,6 @@
 #include <HID-Project.h>
 #include <MIDIUSB.h>
 
-#define KEYPAD_DEBUG 0
 #define LED_UPDATE_INTERVAL 50
 
 /**

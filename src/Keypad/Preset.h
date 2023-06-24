@@ -19,7 +19,7 @@
 #define PRESET_NAME_SIZE 16
 #define EEPROM_START_ADDRESS 0
 //Id + Name + mode + 5 * (KeyH + KeyL + Rb + Gb + Bb + Ra + Ga + Ba + INTb + INTa) + R + G + B + INT
-#define PRESET_EEPROM_LENGTH 1 + PRESET_NAME_SIZE + 1 + (NUM_BUTTONS * 10) + 4
+#define PRESET_EEPROM_LENGTH (1 + PRESET_NAME_SIZE + 1 + (NUM_BUTTONS * 10) + 4)
 
 typedef enum _HwMode : uint8_t
 {
@@ -94,10 +94,10 @@ public:
     /**
      * @brief Set the Buttons object
      *
-     * @param btnPresets An array of BtnPreset objects. Size should be NUM_BTNS.
+     * @param _btnPresets An array of BtnPreset objects. Size should be NUM_BTNS.
      * @return true
      */
-    bool SetButtons(BtnPreset *btnPresets);
+    bool SetButtons(BtnPreset *_btnPresets);
 
     /**
      * @brief Set the Color object
@@ -132,10 +132,10 @@ public:
     /**
      * @brief Get the Buttons object
      *
-     * @param btnPresets Buffer array to write to. Should be NUM_BTNS big.
+     * @param _btnPresets Buffer array to write to. Should be NUM_BTNS big.
      * @return size_t
      */
-    size_t GetButtons(BtnPreset *btnPresets);
+    size_t GetButtons(BtnPreset *_btnPresets);
 
     /**
      * @brief Get the Color object

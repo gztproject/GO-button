@@ -1,3 +1,7 @@
+#define SERIAL_DEBUG 0
+#define KEYPAD_DEBUG 0
+#define PRESET_DEBUG 0
+
 #define NUM_BUTTONS 5
 #define NUM_PRESETS NUM_BUTTONS
 
