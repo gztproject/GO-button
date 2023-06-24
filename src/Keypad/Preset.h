@@ -12,10 +12,14 @@
 
 #include <stdio.h>
 #include <NeoPixelBus.h>
+#include <EEPROM.h>
 
 #include "config.h"
 
 #define PRESET_NAME_SIZE 16
+#define EEPROM_START_ADDRESS 0
+//Id + Name + mode + 5 * (KeyH + KeyL + Rb + Gb + Bb + Ra + Ga + Ba + INTb + INTa) + R + G + B + INT
+#define PRESET_EEPROM_LENGTH 1 + PRESET_NAME_SIZE + 1 + (NUM_BUTTONS * 10) + 4
 
 typedef enum _HwMode : uint8_t
 {
@@ -33,6 +37,7 @@ typedef struct _BtnPreset
     uint8_t baseIntensity;
     uint8_t accentIntensity;
 } BtnPreset;
+
 
 #define RED RgbColor(255, 0, 0)
 #define GREEN RgbColor(0, 255, 0)
@@ -146,19 +151,33 @@ public:
      */
     uint8_t GetIntensity() { return intensity; };
 
+    /**
+     * @brief Saves the current preset to EEPROM. Make sure ID is set before calling this.
+     * 
+     * @return bool Operation was successful      
+     */
+    bool Save();
+
+     /**
+     * @brief Recalls the current preset from EEPROM. Make sure ID is set before calling this.
+     * 
+     * @return bool Operation was successful      
+     */
+    bool Recall();
+
 private:
     uint8_t id;
     char name[PRESET_NAME_SIZE];
     HwMode mode;
-    BtnPreset btnPreset[NUM_BUTTONS];
+    BtnPreset btnPresets[NUM_BUTTONS];
 
     RgbColor color;
     uint8_t intensity;
 
     BtnPreset emptyBtnPreset = {
         .key = 0x00,
-        .baseColor = BLACK,
-        .accentColor = BLACK,
+        .baseColor = RgbColor(0),
+        .accentColor = RgbColor(0),
         .baseIntensity = 0,
         .accentIntensity = 0};
 

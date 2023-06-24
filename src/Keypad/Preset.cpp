@@ -4,8 +4,8 @@
  * @brief A Preset class that defines the keypad behaviour
  * @version 2.0.1
  * @date 2023-06-21
- * 
- * 
+ *
+ *
  */
 #include "Preset.h"
 
@@ -16,7 +16,7 @@ Preset::Preset(uint8_t _id)
     id = _id;
     name[0] = '\0';
     mode = UNKNOWN;
-    color = BLACK;
+    color = RgbColor(0);
     intensity = 0;
     clearActions();
 }
@@ -43,7 +43,7 @@ bool Preset::SetName(char *buf, size_t size)
         name[i] = buf[i];
     }
     name[i] = '\0';
-    
+
     return true;
 }
 
@@ -58,7 +58,7 @@ bool Preset::SetButtons(BtnPreset *btnPresets)
 {
     for (uint8_t i = 0; i < NUM_BUTTONS; i++)
     {
-        btnPreset[i] = btnPresets[i];
+        btnPresets[i] = btnPresets[i];
     }
     return true;
 }
@@ -86,9 +86,80 @@ size_t Preset::GetButtons(BtnPreset *btnPresets)
     size_t i;
     for (i = 0; i < NUM_BUTTONS; i++)
     {
-        btnPresets[i] = btnPreset[i];
+        btnPresets[i] = btnPresets[i];
     }
     return i;
+}
+
+bool Preset::Save()
+{
+    int address = EEPROM_START_ADDRESS + (id * PRESET_EEPROM_LENGTH);
+
+    EEPROM.update(address++, id);
+    for (uint8_t i = 0; i < PRESET_NAME_SIZE; i++)
+    {
+        EEPROM.update(address++, name[i]);
+    }
+    EEPROM.update(address++, mode);
+
+    for (uint8_t i = 0; i < NUM_BUTTONS; i++)
+    {
+        EEPROM.update(address++, highByte(btnPresets[i].key));
+        EEPROM.update(address++, lowByte(btnPresets[i].key));
+        EEPROM.update(address++, btnPresets[i].baseColor.R);
+        EEPROM.update(address++, btnPresets[i].baseColor.G);
+        EEPROM.update(address++, btnPresets[i].baseColor.B);
+        EEPROM.update(address++, btnPresets[i].accentColor.R);
+        EEPROM.update(address++, btnPresets[i].accentColor.G);
+        EEPROM.update(address++, btnPresets[i].accentColor.B);
+        EEPROM.update(address++, btnPresets[i].baseIntensity);
+        EEPROM.update(address++, btnPresets[i].accentIntensity);
+    }
+
+    EEPROM.update(address++, color.R);
+    EEPROM.update(address++, color.G);
+    EEPROM.update(address++, color.B);
+    EEPROM.update(address++, intensity);
+}
+
+bool Preset::Recall()
+{
+    int address = EEPROM_START_ADDRESS + (id * PRESET_EEPROM_LENGTH);
+
+    uint8_t _id = EEPROM.read(address++);
+
+    if (_id != id)
+    {
+        // Using ID as control value
+        return false;
+    }
+
+    id = _id;
+
+    for (uint8_t i = 0; i < PRESET_NAME_SIZE; i++)
+    {
+        name[i] = EEPROM.read(address++);
+    }
+    mode = (HwMode)EEPROM.read(address++);
+
+    for (uint8_t i = 0; i < NUM_BUTTONS; i++)
+    {
+        btnPresets[i].key = EEPROM.read(address++) << 8;
+        btnPresets[i].key |= EEPROM.read(address++);
+        btnPresets[i].baseColor.R = EEPROM.read(address++);
+        btnPresets[i].baseColor.G = EEPROM.read(address++);
+        btnPresets[i].baseColor.B = EEPROM.read(address++);
+        btnPresets[i].accentColor.R = EEPROM.read(address++);
+        btnPresets[i].accentColor.G = EEPROM.read(address++);
+        btnPresets[i].accentColor.B = EEPROM.read(address++);
+        btnPresets[i].baseIntensity = EEPROM.read(address++);
+        btnPresets[i].accentIntensity = EEPROM.read(address++);
+    }
+
+    color.R = EEPROM.read(address++);
+    color.G = EEPROM.read(address++);
+    color.B = EEPROM.read(address++);
+    intensity = EEPROM.read(address++);
 }
 
 #pragma endregion Public
@@ -98,8 +169,31 @@ void Preset::clearActions()
 {
     for (uint8_t i = 0; i < NUM_BUTTONS; i++)
     {
-        btnPreset[i] = emptyBtnPreset;
+        btnPresets[i] = emptyBtnPreset;
     }
 }
+
+// From https://docs.arduino.cc/learn/programming/eeprom-guide#eeprom-iteration
+// unsigned long Preset::eeprom_crc(void)
+// {
+
+//     const unsigned long crc_table[16] = {
+//         0x00000000, 0x1db71064, 0x3b6e20c8, 0x26d930ac,
+//         0x76dc4190, 0x6b6b51f4, 0x4db26158, 0x5005713c,
+//         0xedb88320, 0xf00f9344, 0xd6d6a3e8, 0xcb61b38c,
+//         0x9b64c2b0, 0x86d3d2d4, 0xa00ae278, 0xbdbdf21c
+//     };
+
+//     unsigned long crc = ~0L;
+
+//     for (int index = 0; index < EEPROM.length(); ++index)
+//     {
+//         crc = crc_table[(crc ^ EEPROM[index]) & 0x0f] ^ (crc >> 4);
+//         crc = crc_table[(crc ^ (EEPROM[index] >> 4)) & 0x0f] ^ (crc >> 4);
+//         crc = ~crc;
+//     }
+
+//     return crc;
+// }
 
 #pragma endregion Private
