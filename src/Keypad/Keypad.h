@@ -23,7 +23,25 @@
  *
  */
 namespace Keypad
-{   
+{
+    /**
+     * @brief Set the LEDs, regardless of the keyboard state
+     *
+     * @param c0
+     * @param c1
+     * @param c2
+     * @param c3
+     * @param c4
+     */
+    void SetLeds(RgbColor c0, RgbColor c1, RgbColor c2, RgbColor c3, RgbColor c4);
+
+    /**
+     * @brief Set the LEDs, regardless of the keyboard state
+     *
+     * @param c
+     */
+    void SetAllLeds(RgbColor c);
+
     /**
      * @brief Initializes the keypad with presets and sets a default one
      *
