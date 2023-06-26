@@ -42,8 +42,23 @@ void setup()
             def_preset = 3;
         else if (digitalRead(BTN_0_PIN) && digitalRead(BTN_1_PIN) && digitalRead(BTN_2_PIN) && digitalRead(BTN_3_PIN) && !digitalRead(BTN_4_PIN))
             def_preset = 4;
+        else
+            def_preset = 0;
 
         EEPROM.update((EEPROM_START_ADDRESS + (NUM_PRESETS * PRESET_EEPROM_LENGTH) + 1), def_preset);
+
+        Keypad::SetAllLeds(RgbColor(0));
+
+        for (uint8_t i = 0; i < 5; i++)
+        {
+            delay(100);
+            Keypad::SetAllLeds(RgbColor(0, 255, 0));
+            delay(100);
+            Keypad::SetAllLeds(RgbColor(0));
+        }
+        delay(100);
+        Keypad::SetAllLeds(RgbColor(0, 255, 0));
+        delay(3000);
     }
 
     bool anySuccess = false;
