@@ -38,7 +38,8 @@ jobs:
         uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
           username: ${{ secrets.STAGING_FTP_USER }}
-          server: ${{ secrets.STAGING_FTP_URL }}          
+          server: ${{ secrets.STAGING_FTP_URL }} 
+          port: 2222
           password: ${{ secrets.STAGING_FTP_PASSWORD }}
           local_path: _build/html/
           remote_path: ${{ secrets.STAGING_FTP_DIR }}
