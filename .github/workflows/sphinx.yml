@@ -40,6 +40,7 @@ jobs:
           username: ${{ secrets.STAGING_FTP_USER }}
           server: ${{ secrets.STAGING_FTP_URL }} 
           port: 2222
+          sftp_only: true
           password: ${{ secrets.STAGING_FTP_PASSWORD }}
           local_path: _build/html/
           remote_path: ${{ secrets.STAGING_FTP_DIR }}
