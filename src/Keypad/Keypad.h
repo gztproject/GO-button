@@ -16,7 +16,6 @@
 #include <HID-Project.h>
 #include <MIDIUSB.h>
 
-#define KEYPAD_DEBUG 0
 #define LED_UPDATE_INTERVAL 50
 
 /**
@@ -24,7 +23,32 @@
  *
  */
 namespace Keypad
-{   
+{
+    /**
+     * @brief Set the LEDs, regardless of the keyboard state
+     *
+     * @param c0
+     * @param c1
+     * @param c2
+     * @param c3
+     * @param c4
+     */
+    void SetLeds(RgbColor c0, RgbColor c1, RgbColor c2, RgbColor c3, RgbColor c4);
+
+    /**
+     * @brief Set the selected LED, regardless of the keyboard state
+     * 
+     * @param c4
+     */
+    void SetLed(uint8_t led, RgbColor c);
+
+    /**
+     * @brief Set the LEDs, regardless of the keyboard state
+     *
+     * @param c
+     */
+    void SetAllLeds(RgbColor c);
+
     /**
      * @brief Initializes the keypad with presets and sets a default one
      *

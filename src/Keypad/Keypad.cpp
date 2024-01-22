@@ -72,25 +72,25 @@ namespace Keypad
 
     /**
      * @brief Actually sends the _noteOn_
-     * 
+     *
      * @param channel MIDI channel
      * @param pitch MIDI note (pitch)
      * @param velocity MIDI velocity
      */
     void midiNoteOn(byte channel, byte pitch, byte velocity);
 
-     /**
+    /**
      * @brief Actually sends the _noteOff_
-     * 
+     *
      * @param channel MIDI channel
      * @param pitch MIDI note (pitch)
      * @param velocity MIDI velocity
      */
     void midiNoteOff(byte channel, byte pitch, byte velocity);
 
-     /**
+    /**
      * @brief Actually sends the _controlChange_
-     * 
+     *
      * @param channel MIDI channel
      * @param control MIDI control
      * @param value MIDI control value
@@ -100,6 +100,27 @@ namespace Keypad
 #pragma endregion private defs
 
 #pragma region Public
+
+    void SetLeds(RgbColor c0, RgbColor c1, RgbColor c2, RgbColor c3, RgbColor c4)
+    {
+        strip.SetPixelColor(0, c0);
+        strip.SetPixelColor(1, c1);
+        strip.SetPixelColor(2, c2);
+        strip.SetPixelColor(3, c3);
+        strip.SetPixelColor(4, c4);
+        strip.Show();
+    }
+
+    void SetAllLeds(RgbColor c)
+    {
+        SetLeds(c, c, c, c, c);
+    }
+
+    void SetLed(uint8_t led, RgbColor c)
+    {
+        strip.SetPixelColor(led, c);
+        strip.Show();
+    }
 
     bool Init(Preset *pres, uint8_t defaultId, uint16_t presetTimeout)
     {
@@ -134,7 +155,7 @@ namespace Keypad
         lastMillis = millis();
         time = millis();
 
-        // For the first 3 second        
+        // For the first 3 second
         while (!presetSelected && time - start < presetTimeout)
         {
             time = millis();
