@@ -1,0 +1,28 @@
+name: "Sphinx: Render docs"
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build HTML
+      uses: ammaraskar/sphinx-action@master
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: html-docs
+        path: docs/build/html/
+    - name: Deploy ftp
+      uses: SamKirkland/FTP-Deploy-Action@3.1.1
+      with:
+        port: 2222
+        ftp-server: ${{ secrets.STAGING_FTP_URL }}
+        ftp-username: ${{ secrets.STAGING_FTP_USER }}
+        ftp-password: ${{ secrets.STAGING_FTP_PASSWORD }}
+        server-dir: ${{ secrets.STAGING_FTP_DIR }}
+        local-dir: docs/build/html/
+        dry-run: true
