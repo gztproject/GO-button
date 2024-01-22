@@ -25,4 +25,3 @@ jobs:
         ftp-password: ${{ secrets.STAGING_FTP_PASSWORD }}
         server-dir: ${{ secrets.STAGING_FTP_DIR }}
         local-dir: docs/build/html/
-        dry-run: true
