@@ -40,5 +40,5 @@ jobs:
           username: ${{ secrets.STAGING_FTP_USER }}
           server: ${{ secrets.STAGING_FTP_URL }}          
           password: ${{ secrets.STAGING_FTP_PASSWORD }}
-          local-path: _build/html/
-          remote-path: ${{ secrets.STAGING_FTP_DIR }}
+          local_path: _build/html/
+          remote_path: ${{ secrets.STAGING_FTP_DIR }}
