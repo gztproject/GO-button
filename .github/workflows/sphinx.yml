@@ -5,6 +5,9 @@ on: push
 jobs:
   build:
     runs-on: ubuntu-latest
+    python:
+      install:
+        - requirements: docs/requirements.txt
     permissions:
       contents: write
     steps:
