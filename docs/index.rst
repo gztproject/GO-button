@@ -98,7 +98,7 @@ HID mode
 ---------------------
 Simulates special keys, such as multimedia control or application shortcut keys.
 
-The list of all supported codes is available in the library repository: :ref:``
+The list of all supported codes is available in the `library repository <https://github.com/NicoHood/HID/blob/master/src/HID-APIs/ConsumerAPI.h>`_
 
 Presets
 =================
