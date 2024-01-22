@@ -6,7 +6,7 @@
 GZT-GO Button Documentation
 ==================================
 
-.. Warning:: This documentation is a work in progress, please use it as such :)
+.. attention:: This documentation is a work in progress, please use it as such :)
 
 .. toctree::
    :maxdepth: 2
@@ -15,6 +15,14 @@ GZT-GO Button Documentation
 Quick start guide
 =================
 There is really no special setup needed.
+
++---+---+
+| 1 | 2 |
++---+---+
+| 3 | 4 |
++---+---+
+|   5   |
++-------+
 
 Normal operation
 ---------------------
