@@ -36,6 +36,13 @@ namespace Keypad
     void SetLeds(RgbColor c0, RgbColor c1, RgbColor c2, RgbColor c3, RgbColor c4);
 
     /**
+     * @brief Set the selected LED, regardless of the keyboard state
+     * 
+     * @param c4
+     */
+    void SetLed(uint8_t led, RgbColor c);
+
+    /**
      * @brief Set the LEDs, regardless of the keyboard state
      *
      * @param c

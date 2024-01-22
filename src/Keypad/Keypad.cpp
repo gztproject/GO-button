@@ -116,6 +116,12 @@ namespace Keypad
         SetLeds(c, c, c, c, c);
     }
 
+    void SetLed(uint8_t led, RgbColor c)
+    {
+        strip.SetPixelColor(led, c);
+        strip.Show();
+    }
+
     bool Init(Preset *pres, uint8_t defaultId, uint16_t presetTimeout)
     {
         for (uint8_t i = 0; i < NUM_PRESETS; i++)

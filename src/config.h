@@ -2,6 +2,11 @@
 #define KEYPAD_DEBUG 0
 #define PRESET_DEBUG 0
 
+#define REV_100 0
+#define REV_101 1
+
+#define PCB_REV REV_100
+
 #define NUM_BUTTONS 5
 #define NUM_PRESETS NUM_BUTTONS
 
@@ -19,6 +24,7 @@
 #define MIDI_CH 0
 #define MIDI_VELOCITY 127
 
+#define DEFAULT_PRESET 0
 
 //Preset 0
 #define P0_COL GREEN

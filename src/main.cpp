@@ -12,11 +12,20 @@ void setup()
     delay(5000);
 #endif
 
+#if defined(PCB_REV) && PCB_REV == REV_100
     pinMode(BTN_0_PIN, INPUT_PULLUP);
     pinMode(BTN_1_PIN, INPUT_PULLUP);
     pinMode(BTN_2_PIN, INPUT_PULLUP);
     pinMode(BTN_3_PIN, INPUT_PULLUP);
     pinMode(BTN_4_PIN, INPUT_PULLUP);
+
+#else if defined(PCB_REV) && PCB_REV> REV_101
+    pinMode(BTN_0_PIN, INPUT);
+    pinMode(BTN_1_PIN, INPUT);
+    pinMode(BTN_2_PIN, INPUT);
+    pinMode(BTN_3_PIN, INPUT);
+    pinMode(BTN_4_PIN, INPUT);
+#endif
 
     uint8_t def_preset = EEPROM.read(EEPROM_START_ADDRESS + (NUM_PRESETS * PRESET_EEPROM_LENGTH) + 1);
 
@@ -30,20 +39,38 @@ void setup()
 
         delay(3000);
 
-        Keypad::SetAllLeds(RgbColor(0));
+        Keypad::SetAllLeds(RgbColor(0, 0, 255));
 
-        if (!digitalRead(BTN_0_PIN) && digitalRead(BTN_1_PIN) && digitalRead(BTN_2_PIN) && digitalRead(BTN_3_PIN) && digitalRead(BTN_4_PIN))
-            def_preset = 0;
-        else if (digitalRead(BTN_0_PIN) && !digitalRead(BTN_1_PIN) && digitalRead(BTN_2_PIN) && digitalRead(BTN_3_PIN) && digitalRead(BTN_4_PIN))
-            def_preset = 1;
-        else if (digitalRead(BTN_0_PIN) && digitalRead(BTN_1_PIN) && !digitalRead(BTN_2_PIN) && digitalRead(BTN_3_PIN) && digitalRead(BTN_4_PIN))
-            def_preset = 2;
-        else if (digitalRead(BTN_0_PIN) && digitalRead(BTN_1_PIN) && digitalRead(BTN_2_PIN) && !digitalRead(BTN_3_PIN) && digitalRead(BTN_4_PIN))
-            def_preset = 3;
-        else if (digitalRead(BTN_0_PIN) && digitalRead(BTN_1_PIN) && digitalRead(BTN_2_PIN) && digitalRead(BTN_3_PIN) && !digitalRead(BTN_4_PIN))
-            def_preset = 4;
-        else
-            def_preset = 0;
+        bool selection = false;
+
+        while (!selection)
+        {
+            if (!digitalRead(BTN_0_PIN) && digitalRead(BTN_1_PIN) && digitalRead(BTN_2_PIN) && digitalRead(BTN_3_PIN) && digitalRead(BTN_4_PIN))
+            {
+                def_preset = 0;
+                selection = true;
+            }
+            else if (digitalRead(BTN_0_PIN) && !digitalRead(BTN_1_PIN) && digitalRead(BTN_2_PIN) && digitalRead(BTN_3_PIN) && digitalRead(BTN_4_PIN))
+            {
+                def_preset = 1;
+                selection = true;
+            }
+            else if (digitalRead(BTN_0_PIN) && digitalRead(BTN_1_PIN) && !digitalRead(BTN_2_PIN) && digitalRead(BTN_3_PIN) && digitalRead(BTN_4_PIN))
+            {
+                def_preset = 2;
+                selection = true;
+            }
+            else if (digitalRead(BTN_0_PIN) && digitalRead(BTN_1_PIN) && digitalRead(BTN_2_PIN) && !digitalRead(BTN_3_PIN) && digitalRead(BTN_4_PIN))
+            {
+                def_preset = 3;
+                selection = true;
+            }
+            else if (digitalRead(BTN_0_PIN) && digitalRead(BTN_1_PIN) && digitalRead(BTN_2_PIN) && digitalRead(BTN_3_PIN) && !digitalRead(BTN_4_PIN))
+            {
+                def_preset = 4;
+                selection = true;
+            }
+        }
 
         EEPROM.update((EEPROM_START_ADDRESS + (NUM_PRESETS * PRESET_EEPROM_LENGTH) + 1), def_preset);
 
@@ -53,8 +80,10 @@ void setup()
         {
             delay(100);
             Keypad::SetAllLeds(RgbColor(0, 255, 0));
+            Keypad::SetLed(def_preset, RgbColor(0, 255, 255));
             delay(100);
             Keypad::SetAllLeds(RgbColor(0));
+            Keypad::SetLed(def_preset, RgbColor(0, 0, 255));
         }
         delay(100);
         Keypad::SetAllLeds(RgbColor(0, 255, 0));
@@ -348,4 +377,9 @@ void setPresets()
     Serial.println("Saving preset 4");
 #endif
     presets[4].Save();
+
+#if defined(SERIAL_DEBUG) & SERIAL_DEBUG > 0
+    Serial.println("Saving default preset");
+#endif
+    EEPROM.update(EEPROM_START_ADDRESS + (NUM_PRESETS * PRESET_EEPROM_LENGTH) + 1, DEFAULT_PRESET);
 }
