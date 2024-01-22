@@ -6,7 +6,14 @@
 GZT-GO Button Documentation
 ==================================
 
-.. attention:: This documentation is a work in progress, please use it as such :)
+.. attention:: 
+   This documentation is a work in progress, please use it as such :)
+
+.. attention:: 
+   Currently the presets are set in the FW and cannot be changed by the user. A configurator program is planned for the future.
+   At the moment it's best to contact me if you have any specific needs or wishes.
+   
+   If you'd like to contribute to the project, you're warmly welcome :)
 
 .. toctree::
    :maxdepth: 2
@@ -90,7 +97,7 @@ MIDI mode
 Channel: 0
 Velocity: 127
 
-Keayboard mode
+Keyboard mode
 ---------------------
 Simulates normal keyboard keystrokes (key up/down).
 
@@ -98,7 +105,7 @@ HID mode
 ---------------------
 Simulates special keys, such as multimedia control or application shortcut keys.
 
-The list of all supported codes is available in the `library repository <https://github.com/NicoHood/HID/blob/master/src/HID-APIs/ConsumerAPI.h>`_
+The list of all supported codes is available in the `library repository <https://github.com/NicoHood/HID/blob/master/src/HID-APIs/ConsumerAPI.h>`_.
 
 Presets
 =================
