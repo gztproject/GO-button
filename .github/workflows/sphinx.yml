@@ -34,12 +34,11 @@ jobs:
         run: | 
           cd docs/
           make html    
-      - name: Deploy ftp
-        uses: SamKirkland/FTP-Deploy-Action@3.1.1
+      - name: Deploy Sftp
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
-          port: 2222
-          ftp-server: ${{ secrets.STAGING_FTP_URL }}
-          ftp-username: ${{ secrets.STAGING_FTP_USER }}
-          ftp-password: ${{ secrets.STAGING_FTP_PASSWORD }}
-          server-dir: ${{ secrets.STAGING_FTP_DIR }}
-          local-dir: docs/build/html/
+          username: ${{ secrets.STAGING_FTP_USER }}
+          server: ${{ secrets.STAGING_FTP_URL }}          
+          password: ${{ secrets.STAGING_FTP_PASSWORD }}
+          local-path: _build/html/
+          remote-path: ${{ secrets.STAGING_FTP_DIR }}
