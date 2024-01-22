@@ -43,4 +43,4 @@ jobs:
           sftp_only: true
           password: ${{ secrets.STAGING_FTP_PASSWORD }}
           local_path: docs/_build/html/
-          remote_path: /var/www/html/Docs/go-button
+          remote_path: /var/www/html/Docs/go-button/
