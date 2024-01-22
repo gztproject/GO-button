@@ -109,6 +109,7 @@ Default preset
 -------------------
 
 Out of the box, the default preset is set to be #1.
+
 To change it, follow this steps:
 
 #. Unplug the device
@@ -126,4 +127,13 @@ To change it, follow this steps:
 #. Buttons will turn green and flash to confirm the new selection
 
 #. The device will resume the normal start up with the new default preset
+
+.. attention::
+  This guide is for the lates FW revision (>2024-01-22). 
+  If the LEDs turn solid color at step 4 and then immediatly flash green (without turning blue and waiting at step 5), you have an older version of the firmware.
+  
+  In this case repeat the steps 1-4 but press and hold the desired default preset button immediately after releasing the buttons.
+  Keep holding it until the LEDs flash green.
+
+  In essence, skip step 5 but press the new default button before step 6 continues automatically after 3s.
 
