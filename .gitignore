@@ -4,3 +4,6 @@
 .vscode/launch.json
 .vscode/ipch
 PCB/GO-button/GO-button-backups/
+PCB/GO-button/GO-button-QFN44-backups/
+PCB/production/
+docs/_build/

@@ -1,0 +1,121 @@
+.. GZT-GO documentation master file, created by
+   sphinx-quickstart on Mon Jan 22 09:24:08 2024.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+GZT-GO Button Documentation
+==================================
+
+.. Warning:: This documentation is a work in progress, please use it as such :)
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+Quick start guide
+=================
+There is really no special setup needed.
+
+Normal operation
+---------------------
+To start using the GO button plug it to the computer using a USB C cable. The keypad does not require any special drivers or setup.
+
+Preset selection
+""""""""""""""""""
+After startup all 5 buttons will light up for 3 seconds. During this time you can select 1 of the 5 presets corresponding to each button.
+Out of the box, the presets are as follows:
+
+#. **MIDI mode** (channel: 0, velocity: 127)
+
+   #. Note on/off 47 (Blue)
+      
+   #. Note on/off 48 (Blue)
+      
+   #. Note on/off 50 (Yellow)
+      
+   #. Note on/off 52 (Red)      
+
+   #. Note on/off 53 (Green)            
+
+#. **Keyboard mode**
+
+   #. Up arrow (Blue)
+
+   #. Down arrow (Blue)
+
+   #. P (Yellow)
+
+   #. ESC (Red)
+
+   #. SPACE (Green)
+
+#. **HID mode**
+
+   #. Volume up (Blue)
+
+   #. Volume down (Blue)
+
+   #. Previous (<<) (Green)
+
+   #. Next (>>) (Green)
+
+   #. Play/Pause (Red)
+
+#. **HID mode** Same as #3
+
+#. **HID mode** Same as #3
+
+
+
+Default preset
+---------------------
+If during the 3 seconds after startup no button is pressed, the device will select the default preset. Out of the box, this is #1. 
+To change the default preset, see :ref:`default_preset`
+
+
+Operation modes
+=================
+There are 3 supported operation modes that can be selected using presets:
+
+MIDI mode
+---------------------
+Channel: 0
+Velocity: 127
+
+Keayboard mode
+---------------------
+Simulates normal keyboard keystrokes (key up/down).
+
+HID mode
+---------------------
+Simulates special keys, such as multimedia control or application shortcut keys.
+
+The list of all supported codes is available in the library repository: :ref:``
+
+Presets
+=================
+
+.. _default_preset:
+
+Default preset
+-------------------
+
+Out of the box, the default preset is set to be #1.
+To change it, follow this steps:
+
+#. Unplug the device
+
+#. Press all 5 buttons at once while the device is unplugged
+
+#. Plug in the device while holding the buttons
+
+#. When all the buttons light up white, release the buttons
+
+#. Wait for the buttons to change color to blue (3s)
+
+#. Press the button to select it as the desired default preset
+
+#. Buttons will turn green and flash to confirm the new selection
+
+#. The device will resume the normal start up with the new default preset
+
