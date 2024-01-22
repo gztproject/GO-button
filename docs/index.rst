@@ -10,7 +10,10 @@ GZT-GO Button Documentation
    This documentation is a work in progress, please use it as such :)
 
 .. attention:: 
-   Currently the presets are set in the FW and cannot be changed by the user. A configurator program is planned for the future.
+   Currently the presets are set in the FW and cannot be changed by the user.  A configurator program is planned for the future.
+   
+   You can still select the default preset out of those.
+   
    At the moment it's best to contact me if you have any specific needs or wishes.
    
    If you'd like to contribute to the project, you're warmly welcome :)
