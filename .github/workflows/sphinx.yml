@@ -39,8 +39,8 @@ jobs:
         with:
           username: ${{ secrets.STAGING_FTP_USER }}
           server: ${{ secrets.STAGING_FTP_URL }} 
-          port: 2222
+          port: ${{ secrets.STAGING_FTP_PORT }}
           sftp_only: true
           password: ${{ secrets.STAGING_FTP_PASSWORD }}
-          local_path: docs/_build/html/
-          remote_path: /var/www/html/Docs/go-button/
+          local_path: docs/_build/html/*
+          remote_path: ${{ secrets.STAGING_FTP_DIR }}
