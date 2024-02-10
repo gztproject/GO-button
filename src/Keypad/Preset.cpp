@@ -32,17 +32,19 @@ Preset::Preset(uint8_t _id, HwMode _mode, BtnPreset *btnPresets, RgbColor _color
     SetButtons(btnPresets);
 }
 
-bool Preset::SetName(char *buf, size_t size)
+bool Preset::SetName(const char *buf, size_t size)
 {
     if (size >= PRESET_NAME_SIZE)
         return false;
 
     uint8_t i;
-    for (i = 0; i < size; i++)
+    for (i = 0; i < PRESET_NAME_SIZE; i++)
     {
-        name[i] = buf[i];
+        if (i < size)
+            name[i] = buf[i];
+        else
+            name[i] = 0;
     }
-    name[i] = '\0';
 
     return true;
 }
@@ -141,6 +143,7 @@ bool Preset::Save()
     Serial.print("\tW length: ");
     Serial.println((address - 1) - (EEPROM_START_ADDRESS + (id * PRESET_EEPROM_LENGTH)));
 #endif
+    return true;
 }
 
 bool Preset::Recall()
@@ -201,6 +204,85 @@ bool Preset::Recall()
     Serial.print("\tR length: ");
     Serial.println((address - 1) - (EEPROM_START_ADDRESS + (id * PRESET_EEPROM_LENGTH)));
 #endif
+    return true;
+}
+
+size_t Preset::Serialize(byte *buffer)
+{
+    uint8_t idx = 0;
+
+    buffer[idx++] = id;
+
+    for (uint8_t i = 0; i < PRESET_NAME_SIZE; i++)
+    {
+        buffer[idx++] = name[i];
+    }
+    buffer[idx++] = mode;
+
+    for (uint8_t i = 0; i < NUM_BUTTONS; i++)
+    {
+        buffer[idx++] = highByte(btnPresets[i].key);
+        buffer[idx++] = lowByte(btnPresets[i].key);
+        buffer[idx++] = btnPresets[i].baseColor.R;
+        buffer[idx++] = btnPresets[i].baseColor.G;
+        buffer[idx++] = btnPresets[i].baseColor.B;
+        buffer[idx++] = btnPresets[i].accentColor.R;
+        buffer[idx++] = btnPresets[i].accentColor.G;
+        buffer[idx++] = btnPresets[i].accentColor.B;
+        buffer[idx++] = btnPresets[i].baseIntensity;
+        buffer[idx++] = btnPresets[i].accentIntensity;
+    }
+
+    buffer[idx++] = color.R;
+    buffer[idx++] = color.G;
+    buffer[idx++] = color.B;
+    buffer[idx++] = intensity;
+
+    return idx;
+}
+
+bool Preset::Deserialize(byte *buffer, size_t size)
+{
+    if (size < PRESET_EEPROM_LENGTH)
+        return false;
+
+    size_t idx = 0;
+
+    if (id != buffer[idx++])
+        return false;
+
+    for (uint8_t i = 0; i < PRESET_NAME_SIZE; i++)
+    {
+        name[i] = buffer[idx++];
+    }
+    mode = (HwMode)buffer[idx++];
+
+    for (uint8_t i = 0; i < NUM_BUTTONS; i++)
+    {
+        btnPresets[i].key = buffer[idx++] << 8;
+        btnPresets[i].key |= buffer[idx++];
+#if defined(PRESET_DEBUG) & PRESET_DEBUG > 0
+        Serial.print("\t\tBTN ");
+        Serial.print(i);
+        Serial.print(": ");
+        Serial.println(btnPresets[i].key);
+#endif
+        btnPresets[i].baseColor.R = buffer[idx++];
+        btnPresets[i].baseColor.G = buffer[idx++];
+        btnPresets[i].baseColor.B = buffer[idx++];
+        btnPresets[i].accentColor.R = buffer[idx++];
+        btnPresets[i].accentColor.G = buffer[idx++];
+        btnPresets[i].accentColor.B = buffer[idx++];
+        btnPresets[i].baseIntensity = buffer[idx++];
+        btnPresets[i].accentIntensity = buffer[idx++];
+    }
+
+    color.R = buffer[idx++];
+    color.G = buffer[idx++];
+    color.B = buffer[idx++];
+    intensity = buffer[idx++];
+    
+    return true;
 }
 
 #pragma endregion Public

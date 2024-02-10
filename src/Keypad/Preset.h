@@ -82,7 +82,7 @@ public:
      * @param size Length of the name - should be smaller than PRESET_NAME_SIZE
      * @return bool - False if name is too long
      */
-    bool SetName(char *buf, size_t size);
+    bool SetName(const char *buf, size_t size);
 
     /**
      * @brief Set the KB mode of the preset
@@ -164,6 +164,9 @@ public:
      * @return bool Operation was successful      
      */
     bool Recall();
+
+    size_t Serialize( byte* buffer );
+    bool Deserialize( byte* buffer , size_t size);
 
 private:
     uint8_t id;

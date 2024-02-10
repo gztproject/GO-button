@@ -21,11 +21,8 @@ Button::Button()
     accentIntensity = 0;
     ledColorState = BLACK;
     callback = {};
-#if defined(PCB_REV) && PCB_REV == REV_100
+
     pinMode(btnPin, INPUT_PULLUP);
-#else if defined(PCB_REV) && PCB_REV> REV_100
-    pinMode(btnPin, INPUT);
-#endif
 }
 
 Button::Button(uint8_t _id, uint8_t pin, RgbColor col, uint8_t ledInt, void (*_callback)(uint8_t i, KeyActions action))
@@ -38,11 +35,9 @@ Button::Button(uint8_t _id, uint8_t pin, RgbColor col, uint8_t ledInt, void (*_c
     accentIntensity = ledInt;
     ledColorState = BLACK;
     callback = _callback;
-#if defined(PCB_REV) && PCB_REV == REV_100
+
     pinMode(btnPin, INPUT_PULLUP);
-#else if defined(PCB_REV) && PCB_REV> REV_100
-    pinMode(btnPin, INPUT);
-#endif
+
     LedOff();
 }
 
@@ -56,11 +51,9 @@ Button::Button(uint8_t _id, uint8_t pin, RgbColor bCol, uint8_t bInt, RgbColor a
     accentIntensity = aInt;
     ledColorState = BLACK;
     callback = _callback;
-#if defined(PCB_REV) && PCB_REV == REV_100
+
     pinMode(btnPin, INPUT_PULLUP);
-#else if defined(PCB_REV) && PCB_REV> REV_100
-    pinMode(btnPin, INPUT);
-#endif
+
     LedOff();
 }
 

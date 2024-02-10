@@ -1,33 +1,24 @@
 #include <Arduino.h>
 
+#include "globals.h"
 #include "Keypad/Keypad.h"
+#include "SerialAPI/SerialAPI.h"
 
-Preset presets[NUM_PRESETS];
 void setPresets();
+
+unsigned long lastApiMillis = 0;
 
 void setup()
 {
-#if defined(SERIAL_DEBUG) & SERIAL_DEBUG > 0
-    Serial.begin(115200);
-    delay(5000);
-#endif
+    SerialAPI::Init();
 
-#if defined(PCB_REV) && PCB_REV == REV_100
     pinMode(BTN_0_PIN, INPUT_PULLUP);
     pinMode(BTN_1_PIN, INPUT_PULLUP);
     pinMode(BTN_2_PIN, INPUT_PULLUP);
     pinMode(BTN_3_PIN, INPUT_PULLUP);
     pinMode(BTN_4_PIN, INPUT_PULLUP);
 
-#else if defined(PCB_REV) && PCB_REV> REV_101
-    pinMode(BTN_0_PIN, INPUT);
-    pinMode(BTN_1_PIN, INPUT);
-    pinMode(BTN_2_PIN, INPUT);
-    pinMode(BTN_3_PIN, INPUT);
-    pinMode(BTN_4_PIN, INPUT);
-#endif
-
-    uint8_t def_preset = EEPROM.read(EEPROM_START_ADDRESS + (NUM_PRESETS * PRESET_EEPROM_LENGTH) + 1);
+    def_preset = EEPROM.read(EEPROM_START_ADDRESS + (NUM_PRESETS * PRESET_EEPROM_LENGTH) + 1);
 
     if (!digitalRead(BTN_0_PIN) && !digitalRead(BTN_1_PIN) && !digitalRead(BTN_2_PIN) && !digitalRead(BTN_3_PIN) && !digitalRead(BTN_4_PIN))
     {
@@ -35,7 +26,7 @@ void setup()
         Serial.println("RESETTING!");
 #endif
         Keypad::SetAllLeds(RgbColor(255));
-        setPresets();
+        //setPresets();
 
         delay(3000);
 
@@ -159,6 +150,11 @@ void setup()
 void loop()
 {
     Keypad::Tick();
+    if (millis() - lastApiMillis > 1000)
+    {
+        lastApiMillis = millis();
+        SerialAPI::HandleSerial();
+    }
 }
 
 void setPresets()
