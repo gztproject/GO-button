@@ -1,11 +1,12 @@
+#ifndef _CONFIG_H
+#define _CONFIG_H
+
+#define SERIAL_RX_BUFFER_SIZE 128
+#define SERIAL_TX_BUFFER_SIZE 128
+
 #define SERIAL_DEBUG 0
 #define KEYPAD_DEBUG 0
 #define PRESET_DEBUG 0
-
-#define REV_100 0
-#define REV_101 1
-
-#define PCB_REV REV_100
 
 #define NUM_BUTTONS 5
 #define NUM_PRESETS NUM_BUTTONS
@@ -41,6 +42,7 @@
 #define P0B4_KEY 53
 #define P0B4_COL GREEN
 
+#define DEFAULT_TIMEOUT 3000
 
 //Preset 1
 #define P1_COL RED
@@ -101,3 +103,5 @@
 #define P4B3_COL GREEN
 #define P4B4_KEY MEDIA_PLAY_PAUSE
 #define P4B4_COL RED
+
+#endif

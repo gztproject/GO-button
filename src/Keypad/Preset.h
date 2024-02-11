@@ -23,10 +23,11 @@
 
 typedef enum _HwMode : uint8_t
 {
-    UNKNOWN = 00,
-    KB_MODE = 10,
-    MIDI_MODE = 20,
-    HID_MODE = 30
+    UNKNOWN = 0x00,
+    KB_MODE = 0x10,
+    MIDI_MODE = 0x20,
+    HID_MODE = 0x30,
+    OFF_MODE = 0xFF
 } HwMode;
 
 typedef struct _BtnPreset
@@ -82,7 +83,7 @@ public:
      * @param size Length of the name - should be smaller than PRESET_NAME_SIZE
      * @return bool - False if name is too long
      */
-    bool SetName(char *buf, size_t size);
+    bool SetName(const char *buf, size_t size);
 
     /**
      * @brief Set the KB mode of the preset
@@ -164,6 +165,9 @@ public:
      * @return bool Operation was successful      
      */
     bool Recall();
+
+    size_t Serialize( byte* buffer );
+    bool Deserialize( byte* buffer , size_t size);
 
 private:
     uint8_t id;
