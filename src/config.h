@@ -42,6 +42,7 @@
 #define P0B4_KEY 53
 #define P0B4_COL GREEN
 
+#define DEFAULT_TIMEOUT 3000
 
 //Preset 1
 #define P1_COL RED

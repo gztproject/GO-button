@@ -1,6 +1,6 @@
 #ifndef _VERSION_H
 #define _VERSION_H
 
-#define FW_VERSION "2.1.0"
+const uint8_t FW_version[] = {2, 1, 0};
 
 #endif

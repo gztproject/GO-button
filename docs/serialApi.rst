@@ -12,109 +12,87 @@ Serial port configuraton
 ------------------------
 
 The device exposes a serial port (e.g. /dev/ttyACM0) that communicates at 115200 baud 8-N-1.
-All command s should be sent as hex bytes ending with a newline char ('\n')
 
 Serial API
 ----------
+All communication is in HEX. Commands should be sent as HEX values and responses are returned the same.
 
-getVersion (0x10)
+.. error::
+   Any other than specified responses represent an error and should be ignored. 
+   Possible other responses include (but are not limited to):
+
+   - UNKNOWN COMMAND
+   - INVALID PRESET
+   - ERROR
+
+GetVersion (0x10)
 """"""""""""""""""
-This method returns the current FW version installed on the keypad as plain text.
+This method returns the current FW version installed on the keypad in 3-byte HEX format (see :ref:`version_structure`).
 
-S: 10
+Example
+~~~~~~~
 
-R: 2.1.0 (ASCII)
+=========   ==========================    ==========================
+Direction   Payload (HEX)                 Explanation
+=========   ==========================    ==========================
+Send        10                            GetVersion command
+Receive     [:ref:`version_structure`]    Version number
+=========   ==========================    ==========================
 
-getDefaultPreset (0x20)
+GetDefaultPreset (0x20)
 """"""""""""""""""""""""
-S: 20
+Returns the current default preset number.
 
-R: 1 (ASCII)
+Example
+~~~~~~~
 
-getPreset (0x30)
+=========   =============  ==========================
+Direction   Payload (HEX)  Explanation
+=========   =============  ==========================
+Send        20             GetDefaultPreset command
+Receive     01             Default preset is 1
+=========   =============  ==========================
+
+SetDefaultPreset (0x21)
+""""""""""""""""""""""""
+Sets a new default preset. 
+Returns the newly set default preset number.
+
+Example
+~~~~~~~
+
+=========   =============  ==========================
+Direction   Payload (HEX)  Explanation
+=========   =============  ==========================
+Send        21 00          Set default preset to 0
+Receive     00             Default preset is set to 0
+=========   =============  ==========================
+
+GetPreset (0x30)
 """"""""""""""""
-This method needs an argument as the second byte (selecting the desired preset)
+Returns the desired preset data (see :ref:`preset_structure`).
 
-S: 30 00
+Example
+~~~~~~~
 
-R: 00 4d 49 44 49 00 00 00 00 00 00 00 00 00 00 00 00 14 00 2f 00 00 ff 00 00 ff 33 ad 00 30 00 00 ff 00 00 ff 33 ad 00 32 ff ff 00 ff ff 00 33 ad 00 34 ff 00 00 ff 00 00 33 ad 00 35 00 ff 00 00 ff 00 33 ad 00 ff 00 ad 
+=========   ===============================  ==========================
+Direction   Payload (HEX)                    Explanation
+=========   ===============================  ==========================
+Send        30 00                            Get preset 0 data
+Receive     [:ref:`preset_structure`]        Preset 0 data (71b)
+=========   ===============================  ==========================
 
-+-------------+-------+-------------------------+--------------------------------------------------------+
-| byte(-s)    | field | example                 | explanation                                            |
-+=============+=======+=========================+========================================================+
-|    0        |   id  |   00                    | Preset ID (should be the same as preset number)        |
-+-------------+-------+-------------------------+--------------------------------------------------------+
-|    1-16     |  name | 4d 49 44 49 00 00 00 00 | Preset name (max 16 char, padded with 0s to the right) |
-|             |       +-------------------------+                                                        |
-|             |       | 00 00 00 00 00 00 00 00 |                                                        |
-+-------------+-------+-------------------------+--------------------------------------------------------+
-| 17          | mode  |   14                    | Preset mode (see modes)                                |
-+-------------+-------+-------------------------+-------+------------------------------------------------+
-| 18:19       | Key   |  00 2f                  | Key 0 | Function (depending on mode, see code table)   |
-+-------------+-------+-------------------------+       +------------------------------------------------+
-|       20:22 | Cb    |   00 00 FF              |       | Base color R G B                               |
-+-------------+-------+-------------------------+       +------------------------------------------------+
-|       23:25 | Ca    |   00 00 FF              |       | Accent color R G B                             |
-+-------------+-------+-------------------------+       +------------------------------------------------+
-|         26  | CbI   |   33                    |       | Base color intensity                           |
-+-------------+-------+-------------------------+       +------------------------------------------------+
-|         27  | CaI   |   AD                    |       | Accent color intensity                         |
-+-------------+-------+-------------------------+-------+------------------------------------------------+
-| 28:29       | Key   |  00 30                  | Key 1 | Function (depending on mode, see code table)   |
-+-------------+-------+-------------------------+       +------------------------------------------------+
-|       30:32 | Cb    |   00 00 FF              |       | Base color R G B                               |
-+-------------+-------+-------------------------+       +------------------------------------------------+
-|       33:35 | Ca    |   00 00 FF              |       | Accent color R G B                             |
-+-------------+-------+-------------------------+       +------------------------------------------------+
-|         36  | CbI   |   33                    |       | Base color intensity                           |
-+-------------+-------+-------------------------+       +------------------------------------------------+
-|         37  | CaI   |   AD                    |       | Accent color intensity                         |
-+-------------+-------+-------------------------+-------+------------------------------------------------+
-|       38:39 | Key   |  00 32                  | Key 2 | Function (depending on mode, see code table)   |
-+-------------+-------+-------------------------+       +------------------------------------------------+
-|       40:42 | Cb    |   FF FF 00              |       | Base color R G B                               |
-+-------------+-------+-------------------------+       +------------------------------------------------+
-|       43:45 | Ca    |   FF FF 00              |       | Accent color R G B                             |
-+-------------+-------+-------------------------+       +------------------------------------------------+
-|         46  | CbI   |   33                    |       | Base color intensity                           |
-+-------------+-------+-------------------------+       +------------------------------------------------+
-|         47  | CaI   |   AD                    |       | Accent color intensity                         |
-+-------------+-------+-------------------------+-------+------------------------------------------------+
-|        48:49| Key   |  00 34                  | Key 3 | Function (depending on mode, see code table)   |
-+-------------+-------+-------------------------+       +------------------------------------------------+
-|       50:52 | Cb    |   FF 00 00              |       | Base color R G B                               |
-+-------------+-------+-------------------------+       +------------------------------------------------+
-|       53:55 | Ca    |   FF 00 00              |       | Accent color R G B                             |
-+-------------+-------+-------------------------+       +------------------------------------------------+
-|         56  | CbI   |   33                    |       | Base color intensity                           |
-+-------------+-------+-------------------------+       +------------------------------------------------+
-|         57  | CaI   |   AD                    |       | Accent color intensity                         |
-+-------------+-------+-------------------------+-------+------------------------------------------------+
-|   58:59     | Key   |  00 35                  | Key 4 | Function (depending on mode, see code table)   |
-+-------------+-------+-------------------------+       +------------------------------------------------+
-|       60:62 | Cb    |   00 FF 00              |       | Base color R G B                               |
-+-------------+-------+-------------------------+       +------------------------------------------------+
-|       63:65 | Ca    |   00 FF 00              |       | Accent color R G B                             |
-+-------------+-------+-------------------------+       +------------------------------------------------+
-|         66  | CbI   |   33                    |       | Base color intensity                           |
-+-------------+-------+-------------------------+       +------------------------------------------------+
-|         67  | CaI   |   AD                    |       | Accent color intensity                         |
-+-------------+-------+-------------------------+-------+------------------------------------------------+
-|       68:70 | Cp    |   FF FF 00              |         Preset color R G B                             |
-+-------------+-------+-------------------------+--------------------------------------------------------+
-|       71    | CaI   |   AD                    |         Preset color intensity                         |
-+-------------+-------+-------------------------+--------------------------------------------------------+
-
-
-setDefaultPreset (0x21)
-""""""""""""""""""""""""
-S: 21 00
-
-R: OK
-
-setPreset (0x31)
+SetPreset (0x31)
 """"""""""""""""""
+Sets the desired preset data to a new value.
+Returns the new desired preset data (see :ref:`preset_structure`).
 
-S: 31 00 00 4d 49 44 49 00 00 00 00 00 00 00 00 00 00 00 00 14 00 2f 00 00 ff 00 00 ff 33 ad 00 30 00 00 ff 00 00 ff 33 ad 00 32 ff ff 00 ff ff 00 33 ad 00 34 ff 00 00 ff 00 00 33 ad 00 35 00 ff 00 00 ff 00 33 ad 00 ff 00 ad 
+Example
+~~~~~~~
 
-R: OK
+=========   =====================================  ============================
+Direction   Payload (HEX)                          Explanation
+=========   =====================================  ============================
+Send        31 00 [:ref:`preset_structure`]        Set preset 0 data (2b + 71b)
+Receive     [:ref:`preset_structure`]              Preset 0 data (71b)
+=========   =====================================  ============================

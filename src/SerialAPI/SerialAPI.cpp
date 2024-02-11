@@ -26,18 +26,26 @@ namespace SerialAPI
             size_t size = Serial.readBytesUntil('\n', buffer, SERIAL_RX_BUFFER_SIZE);
 
             byte command = buffer[0];
-            byte arg = buffer[1];
-            byte payload[size - 2];
-            uint8_t i;
-            for (i = 0; i < size - 2; i++)
+            byte arg = 0;
+            byte payload[size];
+            uint8_t i = 0;
+
+            if (size > 1)
             {
-                byte b = buffer[i + 2];
-                if (b == '\n' || b == '\r')
+                arg = buffer[1];
+                if (size > 2)
                 {
-                    i -= 1;
-                    break;
+                    for (i = 0; i < size - 2; i++)
+                    {
+                        byte b = buffer[i + 2];
+                        if (b == '\n' || b == '\r')
+                        {
+                            i -= 1;
+                            break;
+                        }
+                        payload[i] = b;
+                    }
                 }
-                payload[i] = b;
             }
             handleAPI((SerialCommands)command, arg, payload, i);
         }
@@ -48,7 +56,7 @@ namespace SerialAPI
         switch (command)
         {
         case SerialCommands::GetVersion:
-            Serial.println(F(FW_VERSION));
+            Serial.write(FW_version, 3);
             break;
         case SerialCommands::GetPreset:
             dumpPresetOverSerial(argument);
@@ -57,7 +65,7 @@ namespace SerialAPI
             saveNewPresetFromSerial(argument, payload, size);
             break;
         case SerialCommands::GetDefaultPreset:
-            Serial.println(def_preset);
+            Serial.write(Keypad::GetDefaultPreset());
             break;
         case SerialCommands::SetDefaultPreset:
             setNewDefaultPreset(argument);
@@ -74,17 +82,18 @@ namespace SerialAPI
     void dumpPresetOverSerial(uint8_t presetNumber)
     {
         byte buf[SERIAL_TX_BUFFER_SIZE];
-        size_t size = presets[presetNumber].Serialize(buf);
+        size_t size = Keypad::GetPreset(presetNumber)->Serialize(buf);
 
         Serial.write(buf, size);
     }
 
     void saveNewPresetFromSerial(uint8_t presetNumber, byte *presetData, size_t size)
     {
-        if (presets[presetNumber].Deserialize(presetData, size))
+        if (Keypad::GetPreset(presetNumber)->Deserialize(presetData, size))
         {
-            presets[presetNumber].Save();
-            Serial.println("OK");
+            Keypad::GetPreset(presetNumber)->Save();
+            Keypad::SelectPreset(presetNumber);
+            dumpPresetOverSerial(presetNumber);
         }
         else
             Serial.println("ERROR");
@@ -97,9 +106,8 @@ namespace SerialAPI
             Serial.println("INVALID PRESET");
             return;
         }
-        def_preset = presetNumber;
-        EEPROM.update(EEPROM_START_ADDRESS + (NUM_PRESETS * PRESET_EEPROM_LENGTH) + 1, def_preset);
-        Serial.println("OK");
+        Keypad::SetDefaultPreset(presetNumber);
+        Serial.write(Keypad::GetDefaultPreset());
     }
 
 #pragma endregion private functions

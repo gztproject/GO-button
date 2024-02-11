@@ -18,54 +18,54 @@
 
 #define LED_UPDATE_INTERVAL 50
 
+#define KEY_CHORD_RESET 0x1F
+#define KEY_CHORD_SET_DEFAULT 0x10
+
 /**
  * @brief A namespace "simulating" static class
  *
  */
 namespace Keypad
 {
-    /**
-     * @brief Set the LEDs, regardless of the keyboard state
-     *
-     * @param c0
-     * @param c1
-     * @param c2
-     * @param c3
-     * @param c4
-     */
-    void SetLeds(RgbColor c0, RgbColor c1, RgbColor c2, RgbColor c3, RgbColor c4);
-
-    /**
-     * @brief Set the selected LED, regardless of the keyboard state
-     * 
-     * @param c4
-     */
-    void SetLed(uint8_t led, RgbColor c);
-
-    /**
-     * @brief Set the LEDs, regardless of the keyboard state
-     *
-     * @param c
-     */
-    void SetAllLeds(RgbColor c);
 
     /**
      * @brief Initializes the keypad with presets and sets a default one
      *
-     * @param pres A pointer to an array of presets
-     * @param defaultId An ID of the preset to be selected if no user input
-     * @param presetTimeout A timeout in ms after which a default preset is selected
      * @return bool - true if initialization was successful and preset selected.
      */
-    bool Init(Preset *pres, uint8_t defaultId, uint16_t presetTimeout);
+    bool Init();
+
+    /**
+     * @brief Sets the default preset and saves it to EEPROM.
+     *
+     * @param preset
+     * @return true
+     * @return false
+     */
+    bool SetDefaultPreset(uint8_t preset);
+
+    /**
+     * @brief Get the Default Preset number
+     *
+     * @return uint8_t
+     */
+    uint8_t GetDefaultPreset();
+
+    /**
+     * @brief Get the pointer to the desired preset 
+     * 
+     * @param preset 
+     * @return Preset 
+     */
+    Preset* GetPreset(uint8_t preset);
 
     /**
      * @brief Selects a preset
      *
-     * @param preset Preset to select
+     * @param preset Preset number to select
      * @return bool true if successful
      */
-    bool SelectPreset(Preset preset);
+    bool SelectPreset(uint8_t preset);
 
     /**
      * @brief A non-blocking task that does all the work - calls Button.Tick() and updates the colors every LED_UPDATE_INTERVAL ms.

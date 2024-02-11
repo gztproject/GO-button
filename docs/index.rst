@@ -10,9 +10,11 @@ GZT-GO Button Documentation
    This documentation is a work in progress, please use it as such :)
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
    
    manual
+   updating
    serialApi
+   codelists
 

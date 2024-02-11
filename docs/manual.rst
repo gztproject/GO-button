@@ -20,15 +20,6 @@ To start using the GO button plug it to the computer using a USB C cable. The ke
 
 Preset selection
 """"""""""""""""""
-.. attention:: 
-   Currently the presets are set in the FW and cannot be changed by the user.  A configurator program is planned for the future.
-   
-   You can still select the default preset out of those.
-   
-   At the moment it's best to contact me if you have any specific needs or wishes.
-   
-   If you'd like to contribute to the project, you're warmly welcome :)
-
 After startup all 5 buttons will light up for 3 seconds. During this time you can select 1 of the 5 presets corresponding to each button.
 Out of the box, the presets are as follows:
 
@@ -72,6 +63,8 @@ Out of the box, the presets are as follows:
 
 #. **HID mode** Same as #3
 
+To reset the keypad to factory defaults, see :ref:`factory reset`
+
 
 
 Default preset
@@ -107,9 +100,37 @@ Presets
 Default preset
 -------------------
 
+.. attention::
+  This guide is for the latest FW revision (>= 2.1.0 2024-02-11). If behaviour on your device is different see :ref:`firmware_update`.
+
 Out of the box, the default preset is set to be #1.
 
 To change it, follow this steps:
+
+#. Unplug the device
+
+#. Press the button #5 while the device is unplugged
+
+#. Plug in the device while holding the button
+
+#. When all the buttons light up white, release the button
+
+#. Wait for the buttons to change color to preset colors (3s)
+
+#. Press the button to select it as the desired default preset
+
+#. Buttons will flash and turn green to confirm the new selection (3s)
+
+#. The device will resume the normal start up with the new default preset
+
+.. _factory reset:
+
+Factory reset
+-------------------
+.. attention::
+  This guide is for the latest FW version (>= 2.1.0 2024-02-11). If behaviour on your device is different see :ref:`firmware_update`.
+
+To factory reset the device, follow this steps:
 
 #. Unplug the device
 
@@ -117,21 +138,16 @@ To change it, follow this steps:
 
 #. Plug in the device while holding the buttons
 
-#. When all the buttons light up white, release the buttons
+#. When all the buttons light up red, release the buttons
 
-#. Wait for the buttons to change color to blue (3s)
+#. Wait for the device to reset (3s)
 
-#. Press the button to select it as the desired default preset
+#. The device will resume the normal start up with factory defaults.
 
-#. Buttons will turn green and flash to confirm the new selection
+.. note::
+  If the LEDs turn white at step 4 and then flash green after 3s, you have an older version of the firmware.
 
-#. The device will resume the normal start up with the new default preset
-
-.. attention::
-  This guide is for the latest FW revision (>2024-01-22). 
-  If the LEDs turn solid color at step 4 and then immediatly flash green (without turning blue and waiting at step 5), you have an older version of the firmware.
+  This operation will perform both reset and set the new default preset tat the same time.
   
   In this case repeat the steps 1-4 but press and hold the desired default preset button immediately after releasing the buttons.
   Keep holding it until the LEDs flash green.
-
-  In essence, skip step 5 but press the new default button before step 6 continues automatically after 3s.

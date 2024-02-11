@@ -23,10 +23,11 @@
 
 typedef enum _HwMode : uint8_t
 {
-    UNKNOWN = 00,
-    KB_MODE = 10,
-    MIDI_MODE = 20,
-    HID_MODE = 30
+    UNKNOWN = 0x00,
+    KB_MODE = 0x10,
+    MIDI_MODE = 0x20,
+    HID_MODE = 0x30,
+    OFF_MODE = 0xFF
 } HwMode;
 
 typedef struct _BtnPreset

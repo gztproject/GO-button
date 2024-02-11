@@ -5,8 +5,8 @@
 #include <Arduino.h>
 
 #include "config.h"
-#include "globals.h"
 #include "version.h"
+#include "Keypad/Keypad.h"
 
 namespace SerialAPI
 {
