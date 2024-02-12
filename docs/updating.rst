@@ -4,6 +4,9 @@
 Firmware updates
 #####################
 
+.. attention::
+    If updating from a version <2.1.0, you should perform a :ref:`factory reset` after the update.
+
 Web uploader
 =============
 
@@ -12,10 +15,12 @@ Web uploader
 
 The easiest way to update the device is using the online web updater tool_.
 
+
+
 Process
 ----------
 
-- Downloead the latest :download:`firmware.hex <_static/firmware-2.1.0.hex>` file.
+- Download the latest :download:`firmware.hex <_static/firmware-2.1.0.hex>` file.
 - Plug the device to the computer
 - Choose the firmware file using the webpage dialog
 - Click the Reset! button and select the **GZT GO Button** from the list.
@@ -40,7 +45,7 @@ Process
 Linux
 ^^^^^^
 
-- Downloead the latest :download:`firmware.hex <_static/firmware-2.1.0.hex>`  file.
+- Download the latest :download:`firmware.hex <_static/firmware-2.1.0.hex>`  file.
 - Plug the device to the computer
 - Open the terminal and copy/type the following commands:
     - Reset the device in upload mode: ``stty -F /dev/ttyACM0 1200``
