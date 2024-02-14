@@ -822,7 +822,7 @@ namespace Keypad
 #if defined(SERIAL_DEBUG) & SERIAL_DEBUG > 0
         Serial.println("Saving default preset");
 #endif
-        EEPROM.update(EEPROM_START_ADDRESS + (NUM_PRESETS * PRESET_EEPROM_LENGTH) + 1, DEFAULT_PRESET);
+        SetDefaultPreset(DEFAULT_PRESET);
 
         if (!readPresets())
         {
