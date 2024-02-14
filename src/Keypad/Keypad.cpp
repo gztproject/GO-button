@@ -177,8 +177,7 @@ namespace Keypad
         }
 
         // Read the default preset from EEPROM and set relate vars to known states
-        defaultPreset = EEPROM.read(EEPROM_START_ADDRESS + (NUM_PRESETS * PRESET_EEPROM_LENGTH) + 1);
-        activePreset = defaultPreset;
+        defaultPreset = EEPROM.read(EEPROM_START_ADDRESS + (NUM_PRESETS * PRESET_EEPROM_LENGTH) + 1);        
         presetSelected = false;
 
         // this resets all the neopixels to an off state
@@ -204,7 +203,7 @@ namespace Keypad
         lastMillis = millis();
         time = millis();
 
-        // For the first 3 second
+        // For the first 3 seconds wait for user input. Any keypress will call the callback which wil select the preset.
         while (!presetSelected && time - start < DEFAULT_TIMEOUT)
         {
             time = millis();
@@ -227,7 +226,7 @@ namespace Keypad
 
         if (!presetSelected)
         {
-            presetSelected = SelectPreset(activePreset);
+            presetSelected = SelectPreset(defaultPreset);            
         }
 
         for (uint8_t i = 0; i < NUM_BUTTONS; i++)

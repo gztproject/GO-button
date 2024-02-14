@@ -5,7 +5,7 @@ Firmware updates
 #####################
 
 .. attention::
-    If updating from a version <2.1.0, you should perform a :ref:`factory reset` after the update.
+    If updating from a version <:ref:`V-2-1-0`, you should perform a :ref:`factory reset` after the update.
 
 Web uploader
 =============
@@ -20,7 +20,7 @@ The easiest way to update the device is using the online web updater tool_.
 Process
 ----------
 
-- Download the latest :download:`firmware.hex <_static/firmware-2.1.0.hex>` file.
+- Download the latest firmware file: :ref:`changelog`.
 - Plug the device to the computer
 - Choose the firmware file using the webpage dialog
 - Click the Reset! button and select the **GZT GO Button** from the list.
@@ -45,11 +45,11 @@ Process
 Linux
 ^^^^^^
 
-- Download the latest :download:`firmware.hex <_static/firmware-2.1.0.hex>`  file.
+- Download the latest firmware file: :ref:`changelog`.
 - Plug the device to the computer
 - Open the terminal and copy/type the following commands:
     - Reset the device in upload mode: ``stty -F /dev/ttyACM0 1200``
-    - Upload the actual firmware: ``avrdude -p atmega32u4 -c avr109 -b 57600 -D -P /dev/ttyACM0 -U flash:w:/path/to/firmware.hex:i``
+    - Upload the actual firmware: ``avrdude -p atmega32u4 -c avr109 -b 57600 -D -P /dev/ttyACM0 -U flash:w:/path/to/firmware-X.X.X.hex:i``
 
 .. note::
     If the second command is unsuccessful you propably waited too long between the commands. After the first command the device will wait in upload mode for 5s and then restart back to normal operation.
