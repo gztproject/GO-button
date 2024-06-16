@@ -15,7 +15,7 @@
   },
   "bootloader": {
     "efuse": "0xCB",
-    "file": "caterina/Caterina-Feather32u4.hex",
+    "file": "bootloader/caterina.hex",
     "hfuse": "0xD8",
     "lock_bits": "0x2F",
     "lfuse": "0xFF",

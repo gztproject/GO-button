@@ -1,0 +1,922 @@
+   1               		.file	"ConfigDescriptor.c"
+   2               	__SP_H__ = 0x3e
+   3               	__SP_L__ = 0x3d
+   4               	__SREG__ = 0x3f
+   5               	__tmp_reg__ = 0
+   6               	__zero_reg__ = 1
+   7               		.text
+   8               	.Ltext0:
+   9               		.cfi_sections	.debug_frame
+  10               		.section	.text.USB_GetNextDescriptorOfType,"ax",@progbits
+  11               	.global	USB_GetNextDescriptorOfType
+  13               	USB_GetNextDescriptorOfType:
+  14               	.LVL0:
+  15               	.LFB82:
+  16               		.file 1 "LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c"
+   1:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** /*
+   2:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****              LUFA Library
+   3:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****      Copyright (C) Dean Camera, 2011.
+   4:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+   5:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****   dean [at] fourwalledcubicle [dot] com
+   6:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****            www.lufa-lib.org
+   7:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** */
+   8:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+   9:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** /*
+  10:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****   Copyright 2011  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  11:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+  12:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****   Permission to use, copy, modify, distribute, and sell this
+  13:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****   software and its documentation for any purpose is hereby granted
+  14:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****   without fee, provided that the above copyright notice appear in
+  15:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****   all copies and that both that the copyright notice and this
+  16:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****   permission notice and warranty disclaimer appear in supporting
+  17:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****   documentation, and that the name of the author not be used in
+  18:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****   advertising or publicity pertaining to distribution of the
+  19:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****   software without specific, written prior permission.
+  20:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+  21:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****   The author disclaim all warranties with regard to this
+  22:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****   software, including all implied warranties of merchantability
+  23:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****   and fitness.  In no event shall the author be liable for any
+  24:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****   special, indirect or consequential damages or any damages
+  25:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****   whatsoever resulting from loss of use, data or profits, whether
+  26:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****   in an action of contract, negligence or other tortious action,
+  27:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****   arising out of or in connection with the use or performance of
+  28:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****   this software.
+  29:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** */
+  30:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+  31:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** #define  __INCLUDE_FROM_USB_DRIVER
+  32:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** #include "ConfigDescriptor.h"
+  33:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+  34:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** #if defined(USB_CAN_BE_HOST)
+  35:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** uint8_t USB_Host_GetDeviceConfigDescriptor(const uint8_t ConfigNumber,
+  36:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****                                            uint16_t* const ConfigSizePtr,
+  37:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****                                            void* const BufferPtr,
+  38:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****                                            const uint16_t BufferSize)
+  39:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** {
+  40:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	uint8_t ErrorCode;
+  41:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	uint8_t ConfigHeader[sizeof(USB_Descriptor_Configuration_Header_t)];
+  42:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+  43:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	USB_ControlRequest = (USB_Request_Header_t)
+  44:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 		{
+  45:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 			.bmRequestType = (REQDIR_DEVICETOHOST | REQTYPE_STANDARD | REQREC_DEVICE),
+  46:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 			.bRequest      = REQ_GetDescriptor,
+  47:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 			.wValue        = ((DTYPE_Configuration << 8) | (ConfigNumber - 1)),
+  48:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 			.wIndex        = 0,
+  49:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 			.wLength       = sizeof(USB_Descriptor_Configuration_Header_t),
+  50:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 		};
+  51:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+  52:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	Pipe_SelectPipe(PIPE_CONTROLPIPE);
+  53:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+  54:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	if ((ErrorCode = USB_Host_SendControlRequest(ConfigHeader)) != HOST_SENDCONTROL_Successful)
+  55:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	  return ErrorCode;
+  56:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+  57:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	*ConfigSizePtr = le16_to_cpu(DESCRIPTOR_PCAST(ConfigHeader, USB_Descriptor_Configuration_Header_t)
+  58:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+  59:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	if (*ConfigSizePtr > BufferSize)
+  60:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	  return HOST_GETCONFIG_BuffOverflow;
+  61:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+  62:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	USB_ControlRequest.wLength = *ConfigSizePtr;
+  63:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+  64:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	if ((ErrorCode = USB_Host_SendControlRequest(BufferPtr)) != HOST_SENDCONTROL_Successful)
+  65:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	  return ErrorCode;
+  66:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+  67:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	if (DESCRIPTOR_TYPE(BufferPtr) != DTYPE_Configuration)
+  68:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	  return HOST_GETCONFIG_InvalidData;
+  69:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+  70:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	return HOST_GETCONFIG_Successful;
+  71:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** }
+  72:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** #endif
+  73:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+  74:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** void USB_GetNextDescriptorOfType(uint16_t* const BytesRem,
+  75:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****                                  void** const CurrConfigLoc,
+  76:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****                                  const uint8_t Type)
+  77:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** {
+  17               		.loc 1 77 1 view -0
+  18               		.cfi_startproc
+  19               		.loc 1 77 1 is_stmt 0 view .LVU1
+  20 0000 CF93      		push r28
+  21               	.LCFI0:
+  22               		.cfi_def_cfa_offset 3
+  23               		.cfi_offset 28, -2
+  24 0002 DF93      		push r29
+  25               	.LCFI1:
+  26               		.cfi_def_cfa_offset 4
+  27               		.cfi_offset 29, -3
+  28               	/* prologue: function */
+  29               	/* frame size = 0 */
+  30               	/* stack size = 2 */
+  31               	.L__stack_usage = 2
+  32 0004 FC01      		movw r30,r24
+  33 0006 DB01      		movw r26,r22
+  78:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	while (*BytesRem)
+  34               		.loc 1 78 2 is_stmt 1 view .LVU2
+  35               	.LVL1:
+  36               	.L2:
+  37               		.loc 1 78 8 view .LVU3
+  38               		.loc 1 78 9 is_stmt 0 view .LVU4
+  39 0008 8081      		ld r24,Z
+  40 000a 9181      		ldd r25,Z+1
+  41               		.loc 1 78 8 view .LVU5
+  42 000c 0097      		sbiw r24,0
+  43 000e 01F0      		breq .L1
+  79:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	{
+  80:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 		USB_GetNextDescriptor(BytesRem, CurrConfigLoc);
+  44               		.loc 1 80 3 is_stmt 1 view .LVU6
+  45               	.LVL2:
+  46               	.LBB4:
+  47               	.LBI4:
+  48               		.file 2 "LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h"
+   1:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** /*
+   2:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****              LUFA Library
+   3:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****      Copyright (C) Dean Camera, 2011.
+   4:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+   5:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****   dean [at] fourwalledcubicle [dot] com
+   6:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****            www.lufa-lib.org
+   7:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** */
+   8:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+   9:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** /*
+  10:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****   Copyright 2011  Dean Camera (dean [at] fourwalledcubicle [dot] com)
+  11:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+  12:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****   Permission to use, copy, modify, distribute, and sell this
+  13:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****   software and its documentation for any purpose is hereby granted
+  14:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****   without fee, provided that the above copyright notice appear in
+  15:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****   all copies and that both that the copyright notice and this
+  16:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****   permission notice and warranty disclaimer appear in supporting
+  17:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****   documentation, and that the name of the author not be used in
+  18:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****   advertising or publicity pertaining to distribution of the
+  19:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****   software without specific, written prior permission.
+  20:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+  21:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****   The author disclaim all warranties with regard to this
+  22:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****   software, including all implied warranties of merchantability
+  23:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****   and fitness.  In no event shall the author be liable for any
+  24:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****   special, indirect or consequential damages or any damages
+  25:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****   whatsoever resulting from loss of use, data or profits, whether
+  26:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****   in an action of contract, negligence or other tortious action,
+  27:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****   arising out of or in connection with the use or performance of
+  28:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****   this software.
+  29:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** */
+  30:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+  31:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** /** \file
+  32:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****  *  \brief USB Configuration Descriptor definitions.
+  33:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****  *  \copydetails Group_ConfigDescriptorParser
+  34:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****  *
+  35:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****  *  \note This file should not be included directly. It is automatically included as needed by the 
+  36:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****  *        dispatch header located in LUFA/Drivers/USB/USB.h.
+  37:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****  */
+  38:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+  39:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** /** \ingroup Group_Descriptors
+  40:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****  *  \defgroup Group_ConfigDescriptorParser Configuration Descriptor Parser
+  41:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****  *  \brief USB Configuration Descriptor definitions.
+  42:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****  *
+  43:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****  *  This section of the library gives a friendly API which can be used in host applications to easi
+  44:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****  *  parse an attached device's configuration descriptor so that endpoint, interface and other descr
+  45:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****  *  data can be extracted and used as needed.
+  46:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****  *
+  47:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****  *  @{
+  48:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h ****  */
+  49:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+  50:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** #ifndef __CONFIGDESCRIPTOR_H__
+  51:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** #define __CONFIGDESCRIPTOR_H__
+  52:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+  53:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 	/* Includes: */
+  54:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 		#include "../../../Common/Common.h"
+  55:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 		#include "USBMode.h"		
+  56:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 		#include "HostStandardReq.h"
+  57:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 		#include "StdDescriptors.h"
+  58:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+  59:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 	/* Enable C linkage for C++ Compilers: */
+  60:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 		#if defined(__cplusplus)
+  61:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			extern "C" {
+  62:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 		#endif
+  63:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+  64:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 	/* Preprocessor Checks: */
+  65:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 		#if !defined(__INCLUDE_FROM_USB_DRIVER)
+  66:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			#error Do not include this file directly. Include LUFA/Drivers/USB/USB.h instead.
+  67:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 		#endif
+  68:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+  69:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 	/* Public Interface - May be used in end-application: */
+  70:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 		/* Macros: */
+  71:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			/** Casts a pointer to a descriptor inside the configuration descriptor into a pointer to the gi
+  72:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  descriptor type.
+  73:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *
+  74:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  Usage Example:
+  75:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  \code
+  76:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  uint8_t* CurrDescriptor = &ConfigDescriptor[0]; // Pointing to the configuration header
+  77:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  USB_Descriptor_Configuration_Header_t* ConfigHeaderPtr = DESCRIPTOR_PCAST(CurrDescriptor,
+  78:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *                                                           USB_Descriptor_Configuration_Header
+  79:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *
+  80:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  // Can now access elements of the configuration header struct using the -> indirection opera
+  81:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  \endcode
+  82:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 */
+  83:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			#define DESCRIPTOR_PCAST(DescriptorPtr, Type) ((Type*)(DescriptorPtr))
+  84:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+  85:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			/** Casts a pointer to a descriptor inside the configuration descriptor into the given descripto
+  86:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  type (as an actual struct instance rather than a pointer to a struct).
+  87:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *
+  88:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  Usage Example:
+  89:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  \code
+  90:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  uint8_t* CurrDescriptor = &ConfigDescriptor[0]; // Pointing to the configuration header
+  91:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  USB_Descriptor_Configuration_Header_t ConfigHeader = DESCRIPTOR_CAST(CurrDescriptor,
+  92:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *                                                       USB_Descriptor_Configuration_Header_t);
+  93:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *
+  94:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  // Can now access elements of the configuration header struct using the . operator
+  95:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  \endcode
+  96:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 */
+  97:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			#define DESCRIPTOR_CAST(DescriptorPtr, Type)  (*DESCRIPTOR_PCAST(DescriptorPtr, Type))
+  98:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+  99:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			/** Returns the descriptor's type, expressed as the 8-bit type value in the header of the descri
+ 100:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  This value's meaning depends on the descriptor's placement in the descriptor, but standard t
+ 101:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  values can be accessed in the \ref USB_DescriptorTypes_t enum.
+ 102:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 */
+ 103:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			#define DESCRIPTOR_TYPE(DescriptorPtr)    DESCRIPTOR_PCAST(DescriptorPtr, USB_Descriptor_Header_
+ 104:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+ 105:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			/** Returns the descriptor's size, expressed as the 8-bit value indicating the number of bytes. 
+ 106:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			#define DESCRIPTOR_SIZE(DescriptorPtr)    DESCRIPTOR_PCAST(DescriptorPtr, USB_Descriptor_Header_
+ 107:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+ 108:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 		/* Type Defines: */
+ 109:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			/** Type define for a Configuration Descriptor comparator function (function taking a pointer to
+ 110:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  of type void, returning a uint8_t value).
+ 111:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *
+ 112:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  \see \ref USB_GetNextDescriptorComp function for more details.
+ 113:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 */
+ 114:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			typedef uint8_t (* ConfigComparatorPtr_t)(void*);
+ 115:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+ 116:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 		/* Enums: */
+ 117:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			/** Enum for the possible return codes of the \ref USB_Host_GetDeviceConfigDescriptor() function
+ 118:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			enum USB_Host_GetConfigDescriptor_ErrorCodes_t
+ 119:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			{
+ 120:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				HOST_GETCONFIG_Successful       = 0, /**< No error occurred while retrieving the configuration 
+ 121:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				HOST_GETCONFIG_DeviceDisconnect = 1, /**< The attached device was disconnected while retrieving
+ 122:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				                                        * descriptor.
+ 123:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				                                        */
+ 124:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				HOST_GETCONFIG_PipeError        = 2, /**< An error occurred in the pipe while sending the reque
+ 125:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				HOST_GETCONFIG_SetupStalled     = 3, /**< The attached device stalled the request to retrieve t
+ 126:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				                                        * descriptor.
+ 127:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				                                        */
+ 128:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				HOST_GETCONFIG_SoftwareTimeOut  = 4, /**< The request or data transfer timed out. */
+ 129:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				HOST_GETCONFIG_BuffOverflow     = 5, /**< The device's configuration descriptor is too large to
+ 130:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				                                        * buffer.
+ 131:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				                                        */
+ 132:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				HOST_GETCONFIG_InvalidData      = 6, /**< The device returned invalid configuration descriptor 
+ 133:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			};
+ 134:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+ 135:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			/** Enum for return values of a descriptor comparator function. */
+ 136:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			enum DSearch_Return_ErrorCodes_t
+ 137:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			{
+ 138:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				DESCRIPTOR_SEARCH_Found                = 0, /**< Current descriptor matches comparator criteria
+ 139:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				DESCRIPTOR_SEARCH_Fail                 = 1, /**< No further descriptor could possibly match cri
+ 140:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				DESCRIPTOR_SEARCH_NotFound             = 2, /**< Current descriptor does not match comparator c
+ 141:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			};
+ 142:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+ 143:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			/** Enum for return values of \ref USB_GetNextDescriptorComp(). */
+ 144:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			enum DSearch_Comp_Return_ErrorCodes_t
+ 145:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			{
+ 146:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				DESCRIPTOR_SEARCH_COMP_Found           = 0, /**< Configuration descriptor now points to descrip
+ 147:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				                                             *   search criteria of the given comparator functi
+ 148:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				DESCRIPTOR_SEARCH_COMP_Fail            = 1, /**< Comparator function returned \ref DESCRIPTOR_S
+ 149:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				DESCRIPTOR_SEARCH_COMP_EndOfDescriptor = 2, /**< End of configuration descriptor reached before
+ 150:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			};
+ 151:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+ 152:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 		/* Function Prototypes: */
+ 153:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			/** Retrieves the configuration descriptor data from an attached device via a standard request i
+ 154:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  including validity and size checking to prevent a buffer overflow.
+ 155:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *
+ 156:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  \param[in]     ConfigNumber   Device configuration descriptor number to fetch from the devic
+ 157:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *                                single configuration devices).
+ 158:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  \param[in,out] ConfigSizePtr  Pointer to a location for storing the retrieved configuration 
+ 159:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  \param[out]    BufferPtr      Pointer to the buffer for storing the configuration descriptor
+ 160:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  \param[out]    BufferSize     Size of the allocated buffer where the configuration descripto
+ 161:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *
+ 162:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  \return A value from the \ref USB_Host_GetConfigDescriptor_ErrorCodes_t enum.
+ 163:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 */
+ 164:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			uint8_t USB_Host_GetDeviceConfigDescriptor(const uint8_t ConfigNumber,
+ 165:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			                                           uint16_t* const ConfigSizePtr,
+ 166:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			                                           void* const BufferPtr,
+ 167:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			                                           const uint16_t BufferSize) ATTR_NON_NULL_PTR_ARG(2) A
+ 168:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+ 169:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			/** Skips to the next sub-descriptor inside the configuration descriptor of the specified type v
+ 170:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  The bytes remaining value is automatically decremented.
+ 171:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *
+ 172:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 * \param[in,out] BytesRem       Pointer to the number of bytes remaining of the configuration d
+ 173:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 * \param[in,out] CurrConfigLoc  Pointer to the current descriptor inside the configuration desc
+ 174:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 * \param[in]     Type           Descriptor type value to search for.
+ 175:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 */
+ 176:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			void USB_GetNextDescriptorOfType(uint16_t* const BytesRem,
+ 177:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			                                 void** const CurrConfigLoc,
+ 178:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			                                 const uint8_t Type)
+ 179:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			                                 ATTR_NON_NULL_PTR_ARG(1) ATTR_NON_NULL_PTR_ARG(2);
+ 180:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+ 181:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			/** Skips to the next sub-descriptor inside the configuration descriptor of the specified type v
+ 182:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  which must come before a descriptor of the second given type value. If the BeforeType type
+ 183:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  descriptor is reached first, the number of bytes remaining to process is set to zero and the
+ 184:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  function exits. The bytes remaining value is automatically decremented.
+ 185:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *
+ 186:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 * \param[in,out] BytesRem       Pointer to the number of bytes remaining of the configuration d
+ 187:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 * \param[in,out] CurrConfigLoc  Pointer to the current descriptor inside the configuration desc
+ 188:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 * \param[in]     Type           Descriptor type value to search for.
+ 189:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 * \param[in]     BeforeType     Descriptor type value which must not be reached before the give
+ 190:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 */
+ 191:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			void USB_GetNextDescriptorOfTypeBefore(uint16_t* const BytesRem,
+ 192:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			                                       void** const CurrConfigLoc,
+ 193:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			                                       const uint8_t Type,
+ 194:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			                                       const uint8_t BeforeType)
+ 195:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			                                       ATTR_NON_NULL_PTR_ARG(1) ATTR_NON_NULL_PTR_ARG(2);
+ 196:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+ 197:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			/** Skips to the next sub-descriptor inside the configuration descriptor of the specified type v
+ 198:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  which must come after a descriptor of the second given type value. The bytes remaining value
+ 199:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  automatically decremented.
+ 200:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *
+ 201:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 * \param[in,out] BytesRem       Pointer to the number of bytes remaining of the configuration d
+ 202:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 * \param[in,out] CurrConfigLoc  Pointer to the current descriptor inside the configuration desc
+ 203:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 * \param[in]     Type           Descriptor type value to search for.
+ 204:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 * \param[in]     AfterType      Descriptor type value which must be reached before the given Ty
+ 205:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 */
+ 206:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			void USB_GetNextDescriptorOfTypeAfter(uint16_t* const BytesRem,
+ 207:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			                                      void** const CurrConfigLoc,
+ 208:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			                                      const uint8_t Type,
+ 209:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			                                      const uint8_t AfterType)
+ 210:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			                                      ATTR_NON_NULL_PTR_ARG(1) ATTR_NON_NULL_PTR_ARG(2);
+ 211:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+ 212:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			/** Searches for the next descriptor in the given configuration descriptor using a pre-made comp
+ 213:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  function. The routine updates the position and remaining configuration descriptor bytes valu
+ 214:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  automatically. If a comparator routine fails a search, the descriptor pointer is retreated b
+ 215:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  so that the next descriptor search invocation will start from the descriptor which first cau
+ 216:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  original search to fail. This behaviour allows for one comparator to be used immediately aft
+ 217:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  has failed, starting the second search from the descriptor which failed the first.
+ 218:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *
+ 219:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  Comparator functions should be standard functions which accept a pointer to the header of th
+ 220:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  descriptor inside the configuration descriptor which is being compared, and should return a 
+ 221:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  the \ref DSearch_Return_ErrorCodes_t enum as a uint8_t value.
+ 222:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *
+ 223:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  \note This function is available in USB Host mode only.
+ 224:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *
+ 225:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  \param[in,out] BytesRem           Pointer to an int storing the remaining bytes in the confi
+ 226:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  \param[in,out] CurrConfigLoc      Pointer to the current position in the configuration descr
+ 227:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  \param[in]     ComparatorRoutine  Name of the comparator search function to use on the confi
+ 228:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *
+ 229:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  \return Value of one of the members of the \ref DSearch_Comp_Return_ErrorCodes_t enum.
+ 230:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *
+ 231:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  Usage Example:
+ 232:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  \code
+ 233:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  uint8_t EndpointSearcher(void* CurrentDescriptor); // Comparator Prototype
+ 234:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *
+ 235:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  uint8_t EndpointSearcher(void* CurrentDescriptor)
+ 236:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  {
+ 237:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *     if (DESCRIPTOR_TYPE(CurrentDescriptor) == DTYPE_Endpoint)
+ 238:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *         return DESCRIPTOR_SEARCH_Found;
+ 239:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *     else
+ 240:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *         return DESCRIPTOR_SEARCH_NotFound;
+ 241:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  }
+ 242:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *
+ 243:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  //...
+ 244:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  // After retrieving configuration descriptor:
+ 245:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  if (USB_Host_GetNextDescriptorComp(&BytesRemaining, &CurrentConfigLoc, EndpointSearcher) ==
+ 246:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *      Descriptor_Search_Comp_Found)
+ 247:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  {
+ 248:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *      // Do something with the endpoint descriptor
+ 249:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  }
+ 250:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *  \endcode
+ 251:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 */
+ 252:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			uint8_t USB_GetNextDescriptorComp(uint16_t* const BytesRem,
+ 253:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			                                  void** const CurrConfigLoc,
+ 254:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			                                  ConfigComparatorPtr_t const ComparatorRoutine);
+ 255:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+ 256:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 		/* Inline Functions: */
+ 257:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			/** Skips over the current sub-descriptor inside the configuration descriptor, so that the point
+ 258:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			    points to the next sub-descriptor. The bytes remaining value is automatically decremented.
+ 259:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 *
+ 260:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 * \param[in,out] BytesRem       Pointer to the number of bytes remaining of the configuration d
+ 261:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 * \param[in,out] CurrConfigLoc  Pointer to the current descriptor inside the configuration desc
+ 262:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			 */
+ 263:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			static inline void USB_GetNextDescriptor(uint16_t* const BytesRem,
+ 264:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			                                         void** CurrConfigLoc) ATTR_NON_NULL_PTR_ARG(1) ATTR_NON
+ 265:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			static inline void USB_GetNextDescriptor(uint16_t* const BytesRem,
+  49               		.loc 2 265 23 view .LVU7
+  50               	.LBB5:
+ 266:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			                                         void** CurrConfigLoc)
+ 267:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			{
+ 268:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				uint16_t CurrDescriptorSize = DESCRIPTOR_CAST(*CurrConfigLoc, USB_Descriptor_Header_t).Size;
+  51               		.loc 2 268 5 view .LVU8
+  52               		.loc 2 268 35 is_stmt 0 view .LVU9
+  53 0010 CD91      		ld r28,X+
+  54 0012 DC91      		ld r29,X
+  55 0014 1197      		sbiw r26,1
+  56               		.loc 2 268 14 view .LVU10
+  57 0016 2881      		ld r18,Y
+  58 0018 30E0      		ldi r19,0
+  59               	.LVL3:
+ 269:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				
+ 270:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				if (*BytesRem < CurrDescriptorSize)
+  60               		.loc 2 270 5 is_stmt 1 view .LVU11
+  61 001a 2817      		cp r18,r24
+  62 001c 3907      		cpc r19,r25
+  63 001e 00F4      		brsh .L3
+  64 0020 C901      		movw r24,r18
+  65               	.L3:
+  66               	.LVL4:
+ 271:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				  CurrDescriptorSize = *BytesRem;
+ 272:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 
+ 273:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				*CurrConfigLoc  = (void*)((uintptr_t)*CurrConfigLoc + CurrDescriptorSize);
+  67               		.loc 2 273 5 view .LVU12
+  68               		.loc 2 273 57 is_stmt 0 view .LVU13
+  69 0022 C80F      		add r28,r24
+  70 0024 D91F      		adc r29,r25
+  71               		.loc 2 273 21 view .LVU14
+  72 0026 1196      		adiw r26,1
+  73 0028 DC93      		st X,r29
+  74 002a CE93      		st -X,r28
+ 274:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				*BytesRem      -= CurrDescriptorSize;
+  75               		.loc 2 274 5 is_stmt 1 view .LVU15
+  76               		.loc 2 274 20 is_stmt 0 view .LVU16
+  77 002c 2081      		ld r18,Z
+  78 002e 3181      		ldd r19,Z+1
+  79 0030 281B      		sub r18,r24
+  80 0032 390B      		sbc r19,r25
+  81 0034 3183      		std Z+1,r19
+  82 0036 2083      		st Z,r18
+  83               	.LVL5:
+  84               		.loc 2 274 20 view .LVU17
+  85               	.LBE5:
+  86               	.LBE4:
+  81:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+  82:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 		if (DESCRIPTOR_TYPE(*CurrConfigLoc) == Type)
+  87               		.loc 1 82 3 is_stmt 1 view .LVU18
+  88               		.loc 1 82 7 is_stmt 0 view .LVU19
+  89 0038 CD91      		ld r28,X+
+  90 003a DC91      		ld r29,X
+  91 003c 1197      		sbiw r26,1
+  92               		.loc 1 82 6 view .LVU20
+  93 003e 8981      		ldd r24,Y+1
+  94 0040 8413      		cpse r24,r20
+  95 0042 00C0      		rjmp .L2
+  96               	.L1:
+  97               	/* epilogue start */
+  83:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 		  return;
+  84:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	}
+  85:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** }
+  98               		.loc 1 85 1 view .LVU21
+  99 0044 DF91      		pop r29
+ 100 0046 CF91      		pop r28
+ 101 0048 0895      		ret
+ 102               		.cfi_endproc
+ 103               	.LFE82:
+ 105               		.section	.text.USB_GetNextDescriptorOfTypeBefore,"ax",@progbits
+ 106               	.global	USB_GetNextDescriptorOfTypeBefore
+ 108               	USB_GetNextDescriptorOfTypeBefore:
+ 109               	.LVL6:
+ 110               	.LFB83:
+  86:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+  87:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** void USB_GetNextDescriptorOfTypeBefore(uint16_t* const BytesRem,
+  88:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****                                        void** const CurrConfigLoc,
+  89:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****                                        const uint8_t Type,
+  90:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****                                        const uint8_t BeforeType)
+  91:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** {
+ 111               		.loc 1 91 1 is_stmt 1 view -0
+ 112               		.cfi_startproc
+ 113               		.loc 1 91 1 is_stmt 0 view .LVU23
+ 114 0000 CF93      		push r28
+ 115               	.LCFI2:
+ 116               		.cfi_def_cfa_offset 3
+ 117               		.cfi_offset 28, -2
+ 118 0002 DF93      		push r29
+ 119               	.LCFI3:
+ 120               		.cfi_def_cfa_offset 4
+ 121               		.cfi_offset 29, -3
+ 122               	/* prologue: function */
+ 123               	/* frame size = 0 */
+ 124               	/* stack size = 2 */
+ 125               	.L__stack_usage = 2
+ 126 0004 FC01      		movw r30,r24
+ 127 0006 DB01      		movw r26,r22
+  92:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	while (*BytesRem)
+ 128               		.loc 1 92 2 is_stmt 1 view .LVU24
+ 129               	.LVL7:
+ 130               	.L8:
+ 131               		.loc 1 92 8 view .LVU25
+ 132               		.loc 1 92 9 is_stmt 0 view .LVU26
+ 133 0008 8081      		ld r24,Z
+ 134 000a 9181      		ldd r25,Z+1
+ 135               		.loc 1 92 8 view .LVU27
+ 136 000c 0097      		sbiw r24,0
+ 137 000e 01F0      		breq .L7
+  93:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	{
+  94:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 		USB_GetNextDescriptor(BytesRem, CurrConfigLoc);
+ 138               		.loc 1 94 3 is_stmt 1 view .LVU28
+ 139               	.LVL8:
+ 140               	.LBB8:
+ 141               	.LBI8:
+ 265:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			                                         void** CurrConfigLoc)
+ 142               		.loc 2 265 23 view .LVU29
+ 143               	.LBB9:
+ 268:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				
+ 144               		.loc 2 268 5 view .LVU30
+ 268:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				
+ 145               		.loc 2 268 35 is_stmt 0 view .LVU31
+ 146 0010 CD91      		ld r28,X+
+ 147 0012 DC91      		ld r29,X
+ 148 0014 1197      		sbiw r26,1
+ 268:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				
+ 149               		.loc 2 268 14 view .LVU32
+ 150 0016 6881      		ld r22,Y
+ 151 0018 70E0      		ldi r23,0
+ 152               	.LVL9:
+ 270:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				  CurrDescriptorSize = *BytesRem;
+ 153               		.loc 2 270 5 is_stmt 1 view .LVU33
+ 154 001a 6817      		cp r22,r24
+ 155 001c 7907      		cpc r23,r25
+ 156 001e 00F4      		brsh .L9
+ 157 0020 CB01      		movw r24,r22
+ 158               	.L9:
+ 159               	.LVL10:
+ 273:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				*BytesRem      -= CurrDescriptorSize;
+ 160               		.loc 2 273 5 view .LVU34
+ 273:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				*BytesRem      -= CurrDescriptorSize;
+ 161               		.loc 2 273 57 is_stmt 0 view .LVU35
+ 162 0022 C80F      		add r28,r24
+ 163 0024 D91F      		adc r29,r25
+ 273:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				*BytesRem      -= CurrDescriptorSize;
+ 164               		.loc 2 273 21 view .LVU36
+ 165 0026 1196      		adiw r26,1
+ 166 0028 DC93      		st X,r29
+ 167 002a CE93      		st -X,r28
+ 168               		.loc 2 274 5 is_stmt 1 view .LVU37
+ 169               		.loc 2 274 20 is_stmt 0 view .LVU38
+ 170 002c 6081      		ld r22,Z
+ 171 002e 7181      		ldd r23,Z+1
+ 172 0030 681B      		sub r22,r24
+ 173 0032 790B      		sbc r23,r25
+ 174 0034 7183      		std Z+1,r23
+ 175 0036 6083      		st Z,r22
+ 176               	.LVL11:
+ 177               		.loc 2 274 20 view .LVU39
+ 178               	.LBE9:
+ 179               	.LBE8:
+  95:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+  96:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 		if (DESCRIPTOR_TYPE(*CurrConfigLoc) == Type)
+ 180               		.loc 1 96 3 is_stmt 1 view .LVU40
+ 181               		.loc 1 96 7 is_stmt 0 view .LVU41
+ 182 0038 CD91      		ld r28,X+
+ 183 003a DC91      		ld r29,X
+ 184 003c 1197      		sbiw r26,1
+ 185 003e 8981      		ldd r24,Y+1
+ 186               		.loc 1 96 6 view .LVU42
+ 187 0040 8417      		cp r24,r20
+ 188 0042 01F0      		breq .L7
+  97:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 		{
+  98:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 			return;
+  99:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 		}
+ 100:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 		else if (DESCRIPTOR_TYPE(*CurrConfigLoc) == BeforeType)
+ 189               		.loc 1 100 8 is_stmt 1 view .LVU43
+ 190               		.loc 1 100 11 is_stmt 0 view .LVU44
+ 191 0044 8213      		cpse r24,r18
+ 192 0046 00C0      		rjmp .L8
+ 101:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 		{
+ 102:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 			*BytesRem = 0;
+ 193               		.loc 1 102 4 is_stmt 1 view .LVU45
+ 194               		.loc 1 102 14 is_stmt 0 view .LVU46
+ 195 0048 1182      		std Z+1,__zero_reg__
+ 196 004a 1082      		st Z,__zero_reg__
+ 103:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 			return;
+ 197               		.loc 1 103 4 is_stmt 1 view .LVU47
+ 198               	.L7:
+ 199               	/* epilogue start */
+ 104:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 		}
+ 105:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	}
+ 106:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** }
+ 200               		.loc 1 106 1 is_stmt 0 view .LVU48
+ 201 004c DF91      		pop r29
+ 202 004e CF91      		pop r28
+ 203 0050 0895      		ret
+ 204               		.cfi_endproc
+ 205               	.LFE83:
+ 207               		.section	.text.USB_GetNextDescriptorOfTypeAfter,"ax",@progbits
+ 208               	.global	USB_GetNextDescriptorOfTypeAfter
+ 210               	USB_GetNextDescriptorOfTypeAfter:
+ 211               	.LVL12:
+ 212               	.LFB84:
+ 107:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+ 108:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** void USB_GetNextDescriptorOfTypeAfter(uint16_t* const BytesRem,
+ 109:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****                                       void** const CurrConfigLoc,
+ 110:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****                                       const uint8_t Type,
+ 111:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****                                       const uint8_t AfterType)
+ 112:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** {
+ 213               		.loc 1 112 1 is_stmt 1 view -0
+ 214               		.cfi_startproc
+ 215               		.loc 1 112 1 is_stmt 0 view .LVU50
+ 216 0000 FF92      		push r15
+ 217               	.LCFI4:
+ 218               		.cfi_def_cfa_offset 3
+ 219               		.cfi_offset 15, -2
+ 220 0002 0F93      		push r16
+ 221               	.LCFI5:
+ 222               		.cfi_def_cfa_offset 4
+ 223               		.cfi_offset 16, -3
+ 224 0004 1F93      		push r17
+ 225               	.LCFI6:
+ 226               		.cfi_def_cfa_offset 5
+ 227               		.cfi_offset 17, -4
+ 228 0006 CF93      		push r28
+ 229               	.LCFI7:
+ 230               		.cfi_def_cfa_offset 6
+ 231               		.cfi_offset 28, -5
+ 232 0008 DF93      		push r29
+ 233               	.LCFI8:
+ 234               		.cfi_def_cfa_offset 7
+ 235               		.cfi_offset 29, -6
+ 236               	/* prologue: function */
+ 237               	/* frame size = 0 */
+ 238               	/* stack size = 5 */
+ 239               	.L__stack_usage = 5
+ 240 000a EC01      		movw r28,r24
+ 241 000c 8B01      		movw r16,r22
+ 242 000e F42E      		mov r15,r20
+ 243 0010 422F      		mov r20,r18
+ 244               	.LVL13:
+ 113:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	USB_GetNextDescriptorOfType(BytesRem, CurrConfigLoc, AfterType);
+ 245               		.loc 1 113 2 is_stmt 1 view .LVU51
+ 246 0012 0E94 0000 		call USB_GetNextDescriptorOfType
+ 247               	.LVL14:
+ 114:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+ 115:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	if (*BytesRem)
+ 248               		.loc 1 115 2 view .LVU52
+ 249               		.loc 1 115 5 is_stmt 0 view .LVU53
+ 250 0016 8881      		ld r24,Y
+ 251 0018 9981      		ldd r25,Y+1
+ 252 001a 892B      		or r24,r25
+ 253 001c 01F0      		breq .L15
+ 116:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	  USB_GetNextDescriptorOfType(BytesRem, CurrConfigLoc, Type);
+ 254               		.loc 1 116 4 is_stmt 1 view .LVU54
+ 255 001e 4F2D      		mov r20,r15
+ 256 0020 B801      		movw r22,r16
+ 257 0022 CE01      		movw r24,r28
+ 258               	/* epilogue start */
+ 117:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** }
+ 259               		.loc 1 117 1 is_stmt 0 view .LVU55
+ 260 0024 DF91      		pop r29
+ 261 0026 CF91      		pop r28
+ 262               	.LVL15:
+ 263               		.loc 1 117 1 view .LVU56
+ 264 0028 1F91      		pop r17
+ 265 002a 0F91      		pop r16
+ 266               	.LVL16:
+ 267               		.loc 1 117 1 view .LVU57
+ 268 002c FF90      		pop r15
+ 269               	.LVL17:
+ 116:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	  USB_GetNextDescriptorOfType(BytesRem, CurrConfigLoc, Type);
+ 270               		.loc 1 116 4 view .LVU58
+ 271 002e 0C94 0000 		jmp USB_GetNextDescriptorOfType
+ 272               	.LVL18:
+ 273               	.L15:
+ 274               	/* epilogue start */
+ 275               		.loc 1 117 1 view .LVU59
+ 276 0032 DF91      		pop r29
+ 277 0034 CF91      		pop r28
+ 278               	.LVL19:
+ 279               		.loc 1 117 1 view .LVU60
+ 280 0036 1F91      		pop r17
+ 281 0038 0F91      		pop r16
+ 282               	.LVL20:
+ 283               		.loc 1 117 1 view .LVU61
+ 284 003a FF90      		pop r15
+ 285               	.LVL21:
+ 286               		.loc 1 117 1 view .LVU62
+ 287 003c 0895      		ret
+ 288               		.cfi_endproc
+ 289               	.LFE84:
+ 291               		.section	.text.USB_GetNextDescriptorComp,"ax",@progbits
+ 292               	.global	USB_GetNextDescriptorComp
+ 294               	USB_GetNextDescriptorComp:
+ 295               	.LVL22:
+ 296               	.LFB85:
+ 118:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+ 119:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** uint8_t USB_GetNextDescriptorComp(uint16_t* const BytesRem,
+ 120:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****                                   void** const CurrConfigLoc,
+ 121:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c ****                                   ConfigComparatorPtr_t const ComparatorRoutine)
+ 122:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** {
+ 297               		.loc 1 122 1 is_stmt 1 view -0
+ 298               		.cfi_startproc
+ 299               		.loc 1 122 1 is_stmt 0 view .LVU64
+ 300 0000 AF92      		push r10
+ 301               	.LCFI9:
+ 302               		.cfi_def_cfa_offset 3
+ 303               		.cfi_offset 10, -2
+ 304 0002 BF92      		push r11
+ 305               	.LCFI10:
+ 306               		.cfi_def_cfa_offset 4
+ 307               		.cfi_offset 11, -3
+ 308 0004 CF92      		push r12
+ 309               	.LCFI11:
+ 310               		.cfi_def_cfa_offset 5
+ 311               		.cfi_offset 12, -4
+ 312 0006 DF92      		push r13
+ 313               	.LCFI12:
+ 314               		.cfi_def_cfa_offset 6
+ 315               		.cfi_offset 13, -5
+ 316 0008 EF92      		push r14
+ 317               	.LCFI13:
+ 318               		.cfi_def_cfa_offset 7
+ 319               		.cfi_offset 14, -6
+ 320 000a FF92      		push r15
+ 321               	.LCFI14:
+ 322               		.cfi_def_cfa_offset 8
+ 323               		.cfi_offset 15, -7
+ 324 000c 0F93      		push r16
+ 325               	.LCFI15:
+ 326               		.cfi_def_cfa_offset 9
+ 327               		.cfi_offset 16, -8
+ 328 000e 1F93      		push r17
+ 329               	.LCFI16:
+ 330               		.cfi_def_cfa_offset 10
+ 331               		.cfi_offset 17, -9
+ 332 0010 CF93      		push r28
+ 333               	.LCFI17:
+ 334               		.cfi_def_cfa_offset 11
+ 335               		.cfi_offset 28, -10
+ 336 0012 DF93      		push r29
+ 337               	.LCFI18:
+ 338               		.cfi_def_cfa_offset 12
+ 339               		.cfi_offset 29, -11
+ 340               	/* prologue: function */
+ 341               	/* frame size = 0 */
+ 342               	/* stack size = 10 */
+ 343               	.L__stack_usage = 10
+ 344 0014 EC01      		movw r28,r24
+ 345 0016 8B01      		movw r16,r22
+ 346 0018 6A01      		movw r12,r20
+ 123:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	uint8_t ErrorCode;
+ 347               		.loc 1 123 2 is_stmt 1 view .LVU65
+ 124:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+ 125:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	while (*BytesRem)
+ 348               		.loc 1 125 2 view .LVU66
+ 349               	.LVL23:
+ 350               	.L18:
+ 351               		.loc 1 125 8 view .LVU67
+ 352               		.loc 1 125 9 is_stmt 0 view .LVU68
+ 353 001a E880      		ld r14,Y
+ 354 001c F980      		ldd r15,Y+1
+ 355               		.loc 1 125 8 view .LVU69
+ 356 001e E114      		cp r14,__zero_reg__
+ 357 0020 F104      		cpc r15,__zero_reg__
+ 358 0022 01F4      		brne .L21
+ 126:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	{
+ 127:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 		uint8_t* PrevDescLoc  = *CurrConfigLoc;
+ 128:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 		uint16_t PrevBytesRem = *BytesRem;
+ 129:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+ 130:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 		USB_GetNextDescriptor(BytesRem, CurrConfigLoc);
+ 131:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+ 132:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 		if ((ErrorCode = ComparatorRoutine(*CurrConfigLoc)) != DESCRIPTOR_SEARCH_NotFound)
+ 133:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 		{
+ 134:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 			if (ErrorCode == DESCRIPTOR_SEARCH_Fail)
+ 135:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 			{
+ 136:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 				*CurrConfigLoc = PrevDescLoc;
+ 137:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 				*BytesRem      = PrevBytesRem;
+ 138:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 			}
+ 139:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+ 140:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 			return ErrorCode;
+ 141:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 		}
+ 142:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	}
+ 143:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+ 144:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 	return DESCRIPTOR_SEARCH_COMP_EndOfDescriptor;
+ 359               		.loc 1 144 9 view .LVU70
+ 360 0024 82E0      		ldi r24,lo8(2)
+ 361 0026 00C0      		rjmp .L17
+ 362               	.L21:
+ 363               	.LBB13:
+ 127:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 		uint16_t PrevBytesRem = *BytesRem;
+ 364               		.loc 1 127 3 is_stmt 1 view .LVU71
+ 127:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 		uint16_t PrevBytesRem = *BytesRem;
+ 365               		.loc 1 127 12 is_stmt 0 view .LVU72
+ 366 0028 F801      		movw r30,r16
+ 367 002a A080      		ld r10,Z
+ 368 002c B180      		ldd r11,Z+1
+ 369               	.LVL24:
+ 128:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+ 370               		.loc 1 128 3 is_stmt 1 view .LVU73
+ 130:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 
+ 371               		.loc 1 130 3 view .LVU74
+ 372               	.LBB14:
+ 373               	.LBI14:
+ 265:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 			                                         void** CurrConfigLoc)
+ 374               		.loc 2 265 23 view .LVU75
+ 375               	.LBB15:
+ 268:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				
+ 376               		.loc 2 268 5 view .LVU76
+ 268:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				
+ 377               		.loc 2 268 14 is_stmt 0 view .LVU77
+ 378 002e F501      		movw r30,r10
+ 379               	.LVL25:
+ 268:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				
+ 380               		.loc 2 268 14 view .LVU78
+ 381 0030 8081      		ld r24,Z
+ 382 0032 90E0      		ldi r25,0
+ 383               	.LVL26:
+ 270:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				  CurrDescriptorSize = *BytesRem;
+ 384               		.loc 2 270 5 is_stmt 1 view .LVU79
+ 385 0034 9701      		movw r18,r14
+ 386 0036 8E15      		cp r24,r14
+ 387 0038 9F05      		cpc r25,r15
+ 388 003a 00F4      		brsh .L19
+ 270:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				  CurrDescriptorSize = *BytesRem;
+ 389               		.loc 2 270 5 is_stmt 0 view .LVU80
+ 390 003c 9C01      		movw r18,r24
+ 391               	.L19:
+ 392               	.LVL27:
+ 273:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				*BytesRem      -= CurrDescriptorSize;
+ 393               		.loc 2 273 5 is_stmt 1 view .LVU81
+ 273:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				*BytesRem      -= CurrDescriptorSize;
+ 394               		.loc 2 273 57 is_stmt 0 view .LVU82
+ 395 003e C501      		movw r24,r10
+ 396 0040 820F      		add r24,r18
+ 397 0042 931F      		adc r25,r19
+ 273:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.h **** 				*BytesRem      -= CurrDescriptorSize;
+ 398               		.loc 2 273 21 view .LVU83
+ 399 0044 F801      		movw r30,r16
+ 400 0046 9183      		std Z+1,r25
+ 401 0048 8083      		st Z,r24
+ 402               		.loc 2 274 5 is_stmt 1 view .LVU84
+ 403               		.loc 2 274 20 is_stmt 0 view .LVU85
+ 404 004a 8881      		ld r24,Y
+ 405 004c 9981      		ldd r25,Y+1
+ 406 004e 821B      		sub r24,r18
+ 407 0050 930B      		sbc r25,r19
+ 408 0052 9983      		std Y+1,r25
+ 409 0054 8883      		st Y,r24
+ 410               	.LVL28:
+ 411               		.loc 2 274 20 view .LVU86
+ 412               	.LBE15:
+ 413               	.LBE14:
+ 132:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 		{
+ 414               		.loc 1 132 3 is_stmt 1 view .LVU87
+ 132:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 		{
+ 415               		.loc 1 132 20 is_stmt 0 view .LVU88
+ 416 0056 8081      		ld r24,Z
+ 417 0058 9181      		ldd r25,Z+1
+ 418 005a F601      		movw r30,r12
+ 419 005c 0995      		icall
+ 420               	.LVL29:
+ 132:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 		{
+ 421               		.loc 1 132 6 view .LVU89
+ 422 005e 8230      		cpi r24,lo8(2)
+ 423 0060 01F0      		breq .L18
+ 134:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 			{
+ 424               		.loc 1 134 4 is_stmt 1 view .LVU90
+ 134:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 			{
+ 425               		.loc 1 134 7 is_stmt 0 view .LVU91
+ 426 0062 8130      		cpi r24,lo8(1)
+ 427 0064 01F4      		brne .L17
+ 136:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 				*BytesRem      = PrevBytesRem;
+ 428               		.loc 1 136 5 is_stmt 1 view .LVU92
+ 136:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 				*BytesRem      = PrevBytesRem;
+ 429               		.loc 1 136 20 is_stmt 0 view .LVU93
+ 430 0066 F801      		movw r30,r16
+ 431 0068 B182      		std Z+1,r11
+ 432 006a A082      		st Z,r10
+ 137:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 			}
+ 433               		.loc 1 137 5 is_stmt 1 view .LVU94
+ 137:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 			}
+ 434               		.loc 1 137 20 is_stmt 0 view .LVU95
+ 435 006c F982      		std Y+1,r15
+ 436 006e E882      		st Y,r14
+ 437               	.LVL30:
+ 438               	.L17:
+ 439               	/* epilogue start */
+ 137:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** 			}
+ 440               		.loc 1 137 20 view .LVU96
+ 441               	.LBE13:
+ 145:LUFA/LUFA/Drivers/USB/Core/ConfigDescriptor.c **** }
+ 442               		.loc 1 145 1 view .LVU97
+ 443 0070 DF91      		pop r29
+ 444 0072 CF91      		pop r28
+ 445               	.LVL31:
+ 446               		.loc 1 145 1 view .LVU98
+ 447 0074 1F91      		pop r17
+ 448 0076 0F91      		pop r16
+ 449               	.LVL32:
+ 450               		.loc 1 145 1 view .LVU99
+ 451 0078 FF90      		pop r15
+ 452 007a EF90      		pop r14
+ 453 007c DF90      		pop r13
+ 454 007e CF90      		pop r12
+ 455               	.LVL33:
+ 456               		.loc 1 145 1 view .LVU100
+ 457 0080 BF90      		pop r11
+ 458 0082 AF90      		pop r10
+ 459 0084 0895      		ret
+ 460               		.cfi_endproc
+ 461               	.LFE85:
+ 463               		.text
+ 464               	.Letext0:
+ 465               		.file 3 "/mnt/Work/dev/avr8-gcc10/avr/include/stdint.h"
+ 466               		.file 4 "LUFA/LUFA/Drivers/USB/Core/AVR8/../StdDescriptors.h"
+DEFINED SYMBOLS
+                            *ABS*:0000000000000000 ConfigDescriptor.c
+     /tmp/ccKLbvHK.s:2      *ABS*:000000000000003e __SP_H__
+     /tmp/ccKLbvHK.s:3      *ABS*:000000000000003d __SP_L__
+     /tmp/ccKLbvHK.s:4      *ABS*:000000000000003f __SREG__
+     /tmp/ccKLbvHK.s:5      *ABS*:0000000000000000 __tmp_reg__
+     /tmp/ccKLbvHK.s:6      *ABS*:0000000000000001 __zero_reg__
+     /tmp/ccKLbvHK.s:13     .text.USB_GetNextDescriptorOfType:0000000000000000 USB_GetNextDescriptorOfType
+     /tmp/ccKLbvHK.s:108    .text.USB_GetNextDescriptorOfTypeBefore:0000000000000000 USB_GetNextDescriptorOfTypeBefore
+     /tmp/ccKLbvHK.s:210    .text.USB_GetNextDescriptorOfTypeAfter:0000000000000000 USB_GetNextDescriptorOfTypeAfter
+     /tmp/ccKLbvHK.s:294    .text.USB_GetNextDescriptorComp:0000000000000000 USB_GetNextDescriptorComp
+
+NO UNDEFINED SYMBOLS
