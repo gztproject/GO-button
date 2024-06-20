@@ -11,6 +11,10 @@ class Preset {
 
     Print()
     {
+        let el = document.getElementById("td_preset");
+        el.innerHTML = this.id + ": " + this.name + " - " + this.mode;
+        el.style.backgroundColor = this.color.toRgbString();
+
         for (let i=0; i < this.Keys.length; i++) {  
             this.Keys[i].Print();
         }

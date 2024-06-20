@@ -25,3 +25,7 @@ section#controls {
 figcaption {
   font-style: italic;
 }
+
+table {
+  text-align: center;
+}
