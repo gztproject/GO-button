@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" href="styles.css"> 
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="webserial.js"></script>
+  <script src="script.js"></script>
+  <script src="model.js"></script>
+  <title>WebSerial</title>
+</head>
+
+<body>
+  <h1>WebSerial Example</h1>
+  
+  <section id="portControls">
+    <button id="portButton">open port</button>
+  </section>
+  <br><br>
+  <section id="configurator"> 
+    <button id="getVersionBtn">Get version</button><br>
+    <button id="getDefaultPresetBtn">Get default preset</button><br>
+    
+    <label for="preset">Preset (between 0 and 4):</label>
+    <input type="number" id="preset" name="preset" min="0" max="4" value="0"><br>
+    <button id="getPresetBtn">Get preset</button><br>
+  </section>
+  <br><br>
+  <section id="preset">
+    <table> 
+        <tr><td id="td_key0">0</td><td id="td_key1">1</td></tr>
+        <tr><td id="td_key2">2</td><td id="td_key3">3</td></tr>
+        <tr><td id="td_key4">4</td></tr>
+    </table>
+  </section>
+  <br><br>
+  <section id="debug">
+    Latest input from the serial port:
+    <span id="readings">no input yet </span><br>    
+  </section>
+</body>
+
+</html>
