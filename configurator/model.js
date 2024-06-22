@@ -1,8 +1,8 @@
 class Preset {
     constructor(data) 
-    {        
+    {   
         this.id = data[0];
-        this.name = new TextDecoder().decode(data.slice(1,16));
+        this.name = new TextDecoder().decode(data.slice(1,17));
         this.mode = data[17];
         this.Keys = [new Key(data,0),new Key(data,1),new Key(data,2),new Key(data,3),new Key(data,4)];
         this.color = new Color(data[68],data[69],data[70]);
@@ -13,11 +13,33 @@ class Preset {
     {
         
         document.getElementById("preset-val").innerHTML = this.id + ": " + this.name + " - " + this.mode;
-        document.getElementById("preset-col-p").style.backgroundColor = this.color.toRgbString();
+        document.getElementById("preset-col-p").value = this.color.toHex();
 
         for (let i=0; i < this.Keys.length; i++) {  
             this.Keys[i].Print();
         }
+    }
+
+    Serialize()
+    {
+        var p = [this.id];
+        
+        var nameArr = new TextEncoder().encode(this.name);                
+        p = p.concat(Array.from(nameArr));
+        p.push(this.mode);
+        for (let i = 0; i<5; i++)
+        {
+            p = p.concat(this.Keys[i].Serialize());
+        }
+        p = p.concat(this.color.Serialize());
+        p.push(this.intensity);
+        console.log(p);
+        return p;
+    }
+
+    SetColor(hexCol)
+    {
+        thic.Color.setFromHex(hexCol);
     }
 }
 
@@ -40,8 +62,17 @@ class Key
     Print()
     {        
         document.getElementById("key-"+this.id+"-val").innerHTML = this.keyFunction;
-        document.getElementById("key-"+this.id+"-col-p").style.backgroundColor = this.baseColor.toRgbString();
-        document.getElementById("key-"+this.id+"-col-a").style.backgroundColor = this.accentColor.toRgbString();
+        document.getElementById("key-"+this.id+"-col-p").value = this.baseColor.toHex();
+        document.getElementById("key-"+this.id+"-col-a").value = this.accentColor.toHex();
+    }
+
+    Serialize()
+    {
+        var k = [(this.keyFunction>>8),(this.keyFunction & 0xFF)];
+        k = k.concat(this.baseColor.Serialize());
+        k = k.concat(this.accentColor.Serialize());
+        k = k.concat([this.baseInt, this.accentInt]);
+        return k;
     }
 }
 
@@ -57,6 +88,24 @@ class Color
     toRgbString()
     {
         return "rgb("+this.r+","+this.g+","+this.b+")";        
+    }
+
+    toHex()
+    {
+        return "#"+('0'+this.r.toString(16)).slice(-2)+('0'+this.g.toString(16)).slice(-2)+('0'+this.b.toString(16)).slice(-2);
+    }
+
+    Serialize()
+    {
+        return [this.r, this.g, this.b];
+    }
+
+    setFromHex(hexCol)
+    {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hexCol);
+        this.r = parseInt(result[1], 16);
+        this.g = parseInt(result[2], 16);
+        this.b = parseInt(result[3], 16);
     }
 }
 

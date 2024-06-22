@@ -3,6 +3,7 @@
 
 <head>
   <link rel="stylesheet" href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css"/>
+  <link rel="stylesheet" href="styles.css"/>
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -20,7 +21,18 @@
     <div id="main-container" class="fl w-100 pa2">    
       <div id="controls-container" class="fl w-100 pa2">
         <button id="portButton" class="pa2 br2 tc tracked">Connect!</button>
+        <div id="button-row-container" class="fl w-100 pa2 dn">
+          <button id="save-preset-btn" class="pa2 br2 tc tracked">Save current preset</button>
+          <button id="save-default-btn" class="pa2 br2 tc tracked">Set current preset default</button>
+        </div>
       </div> 
+      <div id="loader-container" class="fl w-100 pa2 dn">
+        <div class="fl w-100 pa2">
+        <div class="fl w-50 pa2"></div>
+        <div class="loader fl w-20 pa2"></div>
+        </div>
+        <div id="loader-percent" class="fl w-100 pa2 tc"></div>
+      </div>
       <div id="content-container" class="fl w-100 pa2 dn">
         <div class="fl w-100 pa2">
         <div class="fl w-20 pa2"> </div>
@@ -37,7 +49,9 @@
           <div id="preset-header-container" class="fl w-100 pa2 tc">            
             <div class="fl w-100 pa2 tc">
               <div class="fl w-40 pa2"></div>
-              <div id="preset-col-p" class="fl w-20 pa2 tc"></div>
+              <div class="fl w-20 pa2 tc">
+                <input type="color" id="preset-col-p" style="width:100%;">
+              </div>
               <div class="fl w-40 pa2"></div>
             </div>
             <div id="preset-val" class="fl w-100 pa2 tc"></div>
@@ -45,34 +59,54 @@
           <div id="key-container" class="fl w-100 pa2 tc">
             <div id="key-row-0" class="fl w-100 pa2 tc">
               <div id="key-0-container" class="fl w-50 pa2 tc">
-                <div id="key-0-col-p" class="fl w-30 pa2 tc"></div>
+                <div  class="fl w-30 pa2 tc">
+                  <input type="color" id="key-0-col-p" style="width:100%;">
+                </div>
                 <div id="key-0-val" class="fl w-40 pa2 tc"></div>
-                <div id="key-0-col-a" class="fl w-30 pa2 tc"></div>
+                <div class="fl w-30 pa2 tc">
+                  <input type="color" id="key-0-col-a" style="width:100%;">
+                </div>
               </div>
               <div id="key-1-container" class="fl w-50 pa2 tc">
-                <div id="key-1-col-p" class="fl w-30 pa2 tc"></div>
+                <div class="fl w-30 pa2 tc">
+                  <input type="color" id="key-1-col-p" style="width:100%;">
+                </div>
                 <div id="key-1-val" class="fl w-40 pa2 tc"></div>
-                <div id="key-1-col-a" class="fl w-30 pa2 tc"></div>
+                <div class="fl w-30 pa2 tc">
+                  <input type="color" id="key-1-col-a" style="width:100%;">
+                </div>
               </div>
             </div>
             <div id="btn-row-1" class="fl w-100 pa2 tc">
               <div id="key-2-container" class="fl w-50 pa2 tc">
-                <div id="key-2-col-p" class="fl w-30 pa2 tc"></div>
+                <div class="fl w-30 pa2 tc">
+                  <input type="color" id="key-2-col-p" style="width:100%;">
+                </div>
                 <div id="key-2-val" class="fl w-40 pa2 tc"></div>
-                <div id="key-2-col-a" class="fl w-30 pa2 tc"></div>
+                <div class="fl w-30 pa2 tc">
+                  <input type="color" id="key-2-col-a" style="width:100%;">
+                </div>
               </div>
               <div id="key-3-container" class="fl w-50 pa2 tc">
-                <div id="key-3-col-p" class="fl w-30 pa2 tc"></div>
+                <div class="fl w-30 pa2 tc">
+                  <input type="color" id="key-3-col-p" style="width:100%;">
+                </div>
                 <div id="key-3-val" class="fl w-40 pa2 tc"></div>
-                <div id="key-3-col-a" class="fl w-30 pa2 tc"></div>
+                <div class="fl w-30 pa2 tc">
+                  <input type="color" id="key-3-col-a" style="width:100%;">
+                </div>
               </div>
             </div>
             <div id="btn-row-2" class="fl w-100 pa2 tc">
               <div class="fl w-25 pa2 tc"></div>
               <div id="key-4-container" class="fl w-50 pa2 tc">
-                <div id="key-4-col-p" class="fl w-30 pa2 tc"></div>
+                <div class="fl w-30 pa2 tc">
+                  <input type="color" id="key-4-col-p" style="width:100%;">
+                </div>
                 <div id="key-4-val" class="fl w-40 pa2 tc"></div>
-                <div id="key-4-col-a" class="fl w-30 pa2 tc"></div>
+                <div class="fl w-30 pa2 tc">
+                  <input type="color" id="key-4-col-a" style="width:100%;">
+                </div>
               </div>
               <div class="fl w-25 pa2 tc"></div>
             </div>
@@ -92,7 +126,7 @@
         <div id="fw-version" class="fl w-100 pa2"></div>
       </div>
     </div>
-    <div id="debug-container" class="fl w-100 pa2 dn">
+    <div id="debug-container" class="fl w-100 pa2">
       <div id="debug" class="fl w-100 pa2 tc">
         Latest input from the serial port:
         <span id="readings">no input yet </span><br>    

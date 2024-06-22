@@ -1,16 +1,3 @@
-/*
-  WebSerial wrapper
-  Simplifies WebSerial
-
-  created 15 May 2022
-  modified 16 May 2022
-  by Tom Igoe
-*/
-
-// TODO: multiple ports
-// TODO: multiple data types
-
-// need self = this for connect/disconnect functions
 let self;
 
 class WebSerialPort {

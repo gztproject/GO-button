@@ -37,6 +37,8 @@ function setup() {
 
   document.getElementById("btn-prev").addEventListener("click", prevPreset);
   document.getElementById("btn-next").addEventListener("click", nextPreset);
+  document.getElementById("save-preset-btn").addEventListener("click", savePreset);
+  document.getElementById("save-default-btn").addEventListener("click", setDefault);  
 }
 
 async function openClosePort() {  
@@ -48,7 +50,7 @@ async function openClosePort() {
     if(tryReadDevice())
     {
       portButton.classList.add("dn");
-      document.getElementById("content-container").classList.remove("dn");
+      document.getElementById("loader-container").classList.remove("dn");
     }
     else
     {
@@ -63,18 +65,21 @@ function tryReadDevice()
   switch(state) 
   {
     case 0:
+      document.getElementById("loader-percent").innerHTML = "0%";
       getVersion();   
       setTimeout(tryReadDevice,100);
       return true;
     case 1:
+      document.getElementById("loader-percent").innerHTML = "5%";
       getDefaultPreset(); 
       setTimeout(tryReadDevice,100);
-      return;     
+      return true;     
     case 10:
     case 11:
     case 12:
     case 13:
     case 14:
+      document.getElementById("loader-percent").innerHTML = (10+(16*(state-10)))+"%";
       getPreset(state-10); 
       setTimeout(tryReadDevice,100);
       return true;     
@@ -84,7 +89,9 @@ function tryReadDevice()
     default:      
       break;    
   }
-   
+  document.getElementById("loader-container").classList.add("dn");
+  document.getElementById("button-row-container").classList.remove("dn");
+  document.getElementById("content-container").classList.remove("dn");
   
   CurrentPreset = DefaultPreset; 
   Presets[CurrentPreset].Print();   
@@ -135,6 +142,41 @@ function toHexString(byteArray) {
   }).join('')
 }
 
+function savePreset()
+{
+  
+  if(state != 99 && state != (10+CurrentPreset)){
+    webserial.on("data", parsePreset);
+    console.log("Sending SavePreset cmd.");
+    p = Presets[CurrentPreset];   
+    const data = [0x31, CurrentPreset];
+    data = data.concat(p.Serialize());
+    webserial.sendHex(data, parsePreset);      
+    state = 99;
+  }
+  if(state == 99){
+    setTimeout(setDefault,100);
+    return;
+  }  
+}
+
+function setDefault()
+{    
+  if(state != 99 && state != 10){
+    webserial.on("data", parseDefaultPreset);
+    console.log("Sending SetDefaultPreset cmd.");
+    const data = [0x21, CurrentPreset];   
+    webserial.sendHex(data, parseDefaultPreset);      
+    state = 99;
+  }
+  if(state == 99){
+    setTimeout(setDefault,100);
+    return;
+  }
+  if(DefaultPreset == CurrentPreset)
+    window.alert("Success!");
+}
+
 function getVersion() {    
     //Set the listener  
     webserial.on("data", parseVersion); 
@@ -149,6 +191,12 @@ function getVersion() {
 
 function parseVersion(event) {
   console.log("Parsing the version.");
+  if(event.detail.data.length != 3)
+    {
+      console.log("Wrong length for version, re-reading.");
+      state = 0;
+      return;
+    }
   fwVer = new Version(event.detail.data);
   fwVer.Print();
   console.log(fwVer);
@@ -158,17 +206,23 @@ function parseVersion(event) {
 }
 
 function getDefaultPreset() { 
-   //Set the listener
-   webserial.on("data", parseDefaultPreset);
+  //Set the listener
+  webserial.on("data", parseDefaultPreset);
 
-    console.log("Sending GetDefaultPreset cmd.");
-    const data = [0x20];
-    webserial.sendHex(data, parseDefaultPreset);      
-    state = 99;
+  console.log("Sending GetDefaultPreset cmd.");
+  const data = [0x20];
+  webserial.sendHex(data, parseDefaultPreset);      
+  state = 99;
 }
 
 function parseDefaultPreset(event) {
   console.log("Parsing the DefaultPreset.");
+  if(event.detail.data.length != 1)
+    {
+      console.log("Wrong length for a default, re-reading.");
+      state = 1;
+      return;
+    }
   DefaultPreset = event.detail.data[0];  
   console.log(DefaultPreset);
 
@@ -189,10 +243,15 @@ function getPreset(numPreset) {
 
 function parsePreset(event)
 {
+    if(event.detail.data.length != 72)
+    {
+      console.log("Wrong length for a preset, re-reading preset" + Presets.length);
+      state = 10 + Presets.length;
+      return;
+    }
     p = new Preset(event.detail.data);    
-    console.log(p);
-
-    Presets.push(p);
+    console.log(p);    
+    Presets[p.id] = p;
     
     webserial.off("data", parsePreset);
     state = 10 + p.id + 1;
