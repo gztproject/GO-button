@@ -11,9 +11,9 @@ class Preset {
 
     Print()
     {
-        let el = document.getElementById("td_preset");
-        el.innerHTML = this.id + ": " + this.name + " - " + this.mode;
-        el.style.backgroundColor = this.color.toRgbString();
+        
+        document.getElementById("preset-val").innerHTML = this.id + ": " + this.name + " - " + this.mode;
+        document.getElementById("preset-col-p").style.backgroundColor = this.color.toRgbString();
 
         for (let i=0; i < this.Keys.length; i++) {  
             this.Keys[i].Print();
@@ -38,10 +38,10 @@ class Key
     }
 
     Print()
-    {
-        let el = document.getElementById("td_key"+this.id);
-        el.innerHTML = this.keyFunction;
-        el.style.backgroundColor = this.baseColor.toRgbString();
+    {        
+        document.getElementById("key-"+this.id+"-val").innerHTML = this.keyFunction;
+        document.getElementById("key-"+this.id+"-col-p").style.backgroundColor = this.baseColor.toRgbString();
+        document.getElementById("key-"+this.id+"-col-a").style.backgroundColor = this.accentColor.toRgbString();
     }
 }
 
@@ -67,5 +67,10 @@ class Version
         this.major = data[0];
         this.minor = data[1];
         this.rev = data[2];
+    }
+
+    Print()
+    {
+        document.getElementById("fw-version").innerHTML = this.major+'.'+this.minor+'.'+this.rev;
     }
 }

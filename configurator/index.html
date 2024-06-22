@@ -2,46 +2,111 @@
 <html lang="en">
 
 <head>
-  <link rel="stylesheet" href="styles.css"> 
+  <link rel="stylesheet" href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css"/>
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="webserial.js"></script>
   <script src="script.js"></script>
   <script src="model.js"></script>
-  <title>WebSerial</title>
+  <title>GZT GO configurator</title>
 </head>
 
-<body>
-  <h1>WebSerial Example</h1>
-  
-  <section id="portControls">
-    <button id="portButton">open port</button>
-  </section>
-  <br><br>
-  <section id="configurator"> 
-    <button id="getVersionBtn">Get version</button><br>
-    <button id="getDefaultPresetBtn">Get default preset</button><br>
-    
-    <label for="preset">Preset (between 0 and 4):</label>
-    <input type="number" id="preset" name="preset" min="0" max="4" value="0"><br>
-    <button id="getPresetBtn">Get preset</button><br>
-  </section>
-  <br><br>
-  <section id="preset">
-    <table> 
-        <tr><td colspan="2" id="td_preset"></td></tr>
-        <tr><td colspan="2"></td></tr>
-        <tr><td id="td_key0"></td><td id="td_key1"></td></tr>
-        <tr><td id="td_key2"></td><td id="td_key3"></td></tr>
-        <tr><td colspan="2" id="td_key4"></td></tr>
-    </table>
-  </section>
-  <br><br>
-  <section id="debug">
-    Latest input from the serial port:
-    <span id="readings">no input yet </span><br>    
-  </section>
+<body class="bg-dark-gray  white-80">
+  <header class="fl w-100 pa2 tc">
+    <h1>GZT GO configurator</h1>
+  </header>
+  <main class="fl w-100 pa2 tc">
+    <div id="main-container" class="fl w-100 pa2">    
+      <div id="controls-container" class="fl w-100 pa2">
+        <button id="portButton" class="pa2 br2 tc tracked">Connect!</button>
+      </div> 
+      <div id="content-container" class="fl w-100 pa2 dn">
+        <div class="fl w-100 pa2">
+        <div class="fl w-20 pa2"> </div>
+        <div class="fl w-10 pa2">
+          <button id="btn-prev" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa3 ba border-box mr4">
+            <svg class="w1" data-icon="chevronLeft" viewBox="0 0 32 32" style="fill:currentcolor">
+              <title>chevronLeft icon</title>
+              <path d="M20 1 L24 5 L14 16 L24 27 L20 31 L6 16 z"></path>
+            </svg>
+          <span class="pl1"></span>
+          </button>
+        </div>
+        <div id="preset-container" class="fl w-40 pa2 tc center">         
+          <div id="preset-header-container" class="fl w-100 pa2 tc">            
+            <div class="fl w-100 pa2 tc">
+              <div class="fl w-40 pa2"></div>
+              <div id="preset-col-p" class="fl w-20 pa2 tc"></div>
+              <div class="fl w-40 pa2"></div>
+            </div>
+            <div id="preset-val" class="fl w-100 pa2 tc"></div>
+          </div>
+          <div id="key-container" class="fl w-100 pa2 tc">
+            <div id="key-row-0" class="fl w-100 pa2 tc">
+              <div id="key-0-container" class="fl w-50 pa2 tc">
+                <div id="key-0-col-p" class="fl w-30 pa2 tc"></div>
+                <div id="key-0-val" class="fl w-40 pa2 tc"></div>
+                <div id="key-0-col-a" class="fl w-30 pa2 tc"></div>
+              </div>
+              <div id="key-1-container" class="fl w-50 pa2 tc">
+                <div id="key-1-col-p" class="fl w-30 pa2 tc"></div>
+                <div id="key-1-val" class="fl w-40 pa2 tc"></div>
+                <div id="key-1-col-a" class="fl w-30 pa2 tc"></div>
+              </div>
+            </div>
+            <div id="btn-row-1" class="fl w-100 pa2 tc">
+              <div id="key-2-container" class="fl w-50 pa2 tc">
+                <div id="key-2-col-p" class="fl w-30 pa2 tc"></div>
+                <div id="key-2-val" class="fl w-40 pa2 tc"></div>
+                <div id="key-2-col-a" class="fl w-30 pa2 tc"></div>
+              </div>
+              <div id="key-3-container" class="fl w-50 pa2 tc">
+                <div id="key-3-col-p" class="fl w-30 pa2 tc"></div>
+                <div id="key-3-val" class="fl w-40 pa2 tc"></div>
+                <div id="key-3-col-a" class="fl w-30 pa2 tc"></div>
+              </div>
+            </div>
+            <div id="btn-row-2" class="fl w-100 pa2 tc">
+              <div class="fl w-25 pa2 tc"></div>
+              <div id="key-4-container" class="fl w-50 pa2 tc">
+                <div id="key-4-col-p" class="fl w-30 pa2 tc"></div>
+                <div id="key-4-val" class="fl w-40 pa2 tc"></div>
+                <div id="key-4-col-a" class="fl w-30 pa2 tc"></div>
+              </div>
+              <div class="fl w-25 pa2 tc"></div>
+            </div>
+          </div>
+        </div>         
+        <div class="fl w-10 pa2"> 
+          <button id="btn-next" class="f5 no-underline black bg-animate hover-bg-black hover-white inline-flex items-center pa3 ba border-box">
+            <span class="pr1"></span>
+            <svg class="w1" data-icon="chevronRight" viewBox="0 0 32 32" style="fill:currentcolor">
+              <title>chevronRight icon</title>
+              <path d="M12 1 L26 16 L12 31 L8 27 L18 16 L8 5 z"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="fl w-20 pa2"> </div>
+        </div>
+        <div id="fw-version" class="fl w-100 pa2"></div>
+      </div>
+    </div>
+    <div id="debug-container" class="fl w-100 pa2 dn">
+      <div id="debug" class="fl w-100 pa2 tc">
+        Latest input from the serial port:
+        <span id="readings">no input yet </span><br>    
+      </div>
+    </div>
+</main>
+  <footer class="pv5 pv6-l ph4 bt tc static bottom-0">
+    <p class="f6"><span class="dib mr4 mr5-ns">©2024 GZT</span>
+      <a class="link white-80 hover-gold" href="https://docs.gzt.si/go-button" target="_blank">Documentation</a> /
+      <a class="link white-80 hover-gold" href="https://github.com/gztproject/GO-button" target="_blank"> Github </a> /
+      <a class="link white-80 hover-gold" href="mailto:info@gzt.si?subject=GZT-GO question">info@gzt.si </a>
+    </p>
+  </footer>
 </body>
+
 
 </html>

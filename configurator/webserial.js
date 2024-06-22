@@ -52,6 +52,9 @@ class WebSerialPort {
     this.on = (message, handler) => {
       parent.addEventListener(message, handler);
     };
+    this.off = (message, handler) => {
+      parent.removeEventListener(message, handler);
+    };
   }
 
   async openPort(thisPort) {
