@@ -73,6 +73,15 @@ class Preset {
         }
     }
 
+    SetKeyFunction(key, fnc)
+    {
+        if(fnc != this.#keys[key].getFunction())
+        {
+            this.#keys[key].SetFunction(fnc);
+            this.#changed = true;
+        }
+    }
+
     GetId()
     {
         return this.#id;
@@ -178,6 +187,11 @@ class Key
         this.#accentColor.setFromHex(hexCol);
     }
 
+    SetFunction(fnc)
+    {
+        this.#function = fnc;
+    }
+
     getBaseColorHex()
     {
         return this.#baseColor.toHex();
@@ -186,6 +200,11 @@ class Key
     getAccentColorHex()
     {
         return this.#accentColor.toHex();
+    }
+
+    getFunction()
+    {
+        return this.#function;
     }
 }
 
@@ -289,22 +308,6 @@ const KBKeyFunctions = Object.freeze({
     NUM_8: 37,
     NUM_9: 38,
     NUM_0: 39,
-    KEYPAD_DIVIDE: 0x0054,
-    KEYPAD_MULTIPLY: 0x0055,
-    KEYPAD_SUBTRACT: 0x0056,
-    KEYPAD_ADD: 0x0057,
-    KEYPAD_ENTER: 0x0058,
-    KEYPAD_1: 0x0059,
-    KEYPAD_2: 0x005A,
-    KEYPAD_3: 0x005B,
-    KEYPAD_4: 0x005C,
-    KEYPAD_5: 0x005D,
-    KEYPAD_6: 0x005E,
-    KEYPAD_7: 0x005F,
-    KEYPAD_8: 0x0060,
-    KEYPAD_9: 0x0061,
-    KEYPAD_0: 0x0062,
-    KEYPAD_DOT: 0x0063,
     ENTER: 40,
     ESC: 41,
     BACKSPACE: 42,
@@ -349,6 +352,24 @@ const KBKeyFunctions = Object.freeze({
     DOWN_ARROW: 0x0051,
     UP_ARROW: 0x0052,
     NUM_LOCK: 0x0053,
+    KEYPAD_DIVIDE: 0x0054,
+    KEYPAD_MULTIPLY: 0x0055,
+    KEYPAD_SUBTRACT: 0x0056,
+    KEYPAD_ADD: 0x0057,
+    KEYPAD_ENTER: 0x0058,
+    KEYPAD_1: 0x0059,
+    KEYPAD_2: 0x005A,
+    KEYPAD_3: 0x005B,
+    KEYPAD_4: 0x005C,
+    KEYPAD_5: 0x005D,
+    KEYPAD_6: 0x005E,
+    KEYPAD_7: 0x005F,
+    KEYPAD_8: 0x0060,
+    KEYPAD_9: 0x0061,
+    KEYPAD_0: 0x0062,
+    KEYPAD_DOT: 0x0063,
+    
+    
     NON_US: 0x0064,
     MENU: 0x0065
 });

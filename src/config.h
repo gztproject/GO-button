@@ -52,11 +52,11 @@
 #define P1B0_COL BLUE
 #define P1B1_KEY KEY_DOWN_ARROW
 #define P1B1_COL BLUE
-#define P1B2_KEY 'P'
+#define P1B2_KEY KEY_P
 #define P1B2_COL YELLOW
 #define P1B3_KEY KEY_ESC
 #define P1B3_COL RED
-#define P1B4_KEY ' '
+#define P1B4_KEY KEY_SPACE
 #define P1B4_COL GREEN
 
 //Preset 2

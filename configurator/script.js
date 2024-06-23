@@ -150,6 +150,9 @@ function enableDisableButtons()
     document.getElementById("key-"+i+"-col-a").addEventListener("input", function() {
       CurrentPreset.SetKeyAccentColor(i, this.value);
     });
+    document.getElementById("key-"+i+"-val").addEventListener("input", function() {
+      CurrentPreset.SetKeyFunction(i, this.value);
+    });
   }
 }
 
