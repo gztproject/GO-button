@@ -93,39 +93,64 @@ function tryReadDevice()
   document.getElementById("button-row-container").classList.remove("dn");
   document.getElementById("content-container").classList.remove("dn");
   
-  CurrentPreset = DefaultPreset; 
-  Presets[CurrentPreset].Print();   
+  CurrentPreset = Presets[DefaultPreset];
+  CurrentPreset.Print();   
   enableDisableButtons(); 
   return true;
 }
 
 function nextPreset()
-{
-  if(CurrentPreset++ < 4)
-    Presets[CurrentPreset].Print();  
-
+{  
+  if(CurrentPreset.GetId() < 4){
+    if(CurrentPreset.IsChanged()){
+      if(!confirm("Current preset is not saved, continue?"))
+        return;
+    }
+    CurrentPreset = Presets[CurrentPreset.GetId() + 1];
+    CurrentPreset.Print();
+  }
   enableDisableButtons();
 }
 
 function prevPreset()
 {
-  if(CurrentPreset-- > 0)
-    Presets[CurrentPreset].Print();  
-
+  if(CurrentPreset.GetId() > 0){
+    if(CurrentPreset.IsChanged()){
+      if(!confirm("Current preset is not saved, continue?"))
+        return;
+    }
+    CurrentPreset = Presets[CurrentPreset.GetId() - 1];
+    CurrentPreset.Print();
+  }
   enableDisableButtons();
 }
 
 function enableDisableButtons()
 {
-  if(CurrentPreset >= 4)
+  //Navigation buttons
+  if(CurrentPreset.GetId() >= 4)
     document.getElementById("btn-next").disabled = true;
   else
     document.getElementById("btn-next").disabled = false;
 
-  if(CurrentPreset <= 0)
+  if(CurrentPreset.GetId() <= 0)
     document.getElementById("btn-prev").disabled = true;
   else
     document.getElementById("btn-prev").disabled = false;
+
+  //Register all the events
+  document.getElementById("preset-col-p").addEventListener("input", function() {
+    CurrentPreset.SetColor(this.value);
+  });
+  for(let i=0; i<5;i++)
+  {
+    document.getElementById("key-"+i+"-col-p").addEventListener("input", function() {
+      CurrentPreset.SetKeyBaseColor(i, this.value);
+    });
+    document.getElementById("key-"+i+"-col-a").addEventListener("input", function() {
+      CurrentPreset.SetKeyAccentColor(i, this.value);
+    });
+  }
 }
 
 function serialRead(event) {
@@ -145,13 +170,12 @@ function toHexString(byteArray) {
 function savePreset()
 {
   
-  if(state != 99 && state != (10+CurrentPreset)){
+  if(state != 99 && state != (10+CurrentPreset.GetId())){
     webserial.on("data", parsePreset);
-    console.log("Sending SavePreset cmd.");
-    p = Presets[CurrentPreset];   
-    const data = [0x31, CurrentPreset];
-    data = data.concat(p.Serialize());
-    webserial.sendHex(data, parsePreset);      
+    console.log("Sending SavePreset cmd.");    
+    var data = [0x31, CurrentPreset.GetId()];
+    data = data.concat(CurrentPreset.Serialize());
+    webserial.sendHex(data);      
     state = 99;
   }
   if(state == 99){
@@ -165,15 +189,15 @@ function setDefault()
   if(state != 99 && state != 10){
     webserial.on("data", parseDefaultPreset);
     console.log("Sending SetDefaultPreset cmd.");
-    const data = [0x21, CurrentPreset];   
-    webserial.sendHex(data, parseDefaultPreset);      
+    const data = [0x21, CurrentPreset.GetId()];   
+    webserial.sendHex(data);      
     state = 99;
   }
   if(state == 99){
     setTimeout(setDefault,100);
     return;
   }
-  if(DefaultPreset == CurrentPreset)
+  if(DefaultPreset == CurrentPreset.GetId())
     window.alert("Success!");
 }
 
@@ -211,7 +235,7 @@ function getDefaultPreset() {
 
   console.log("Sending GetDefaultPreset cmd.");
   const data = [0x20];
-  webserial.sendHex(data, parseDefaultPreset);      
+  webserial.sendHex(data);      
   state = 99;
 }
 
@@ -251,10 +275,11 @@ function parsePreset(event)
     }
     p = new Preset(event.detail.data);    
     console.log(p);    
-    Presets[p.id] = p;
+    Presets[p.GetId()] = p;
+    CurrentPreset = p;
     
     webserial.off("data", parsePreset);
-    state = 10 + p.id + 1;
+    state = 10 + p.GetId() + 1;
 }
 
 function sleep(ms) {

@@ -15,7 +15,7 @@ void setup()
 void loop()
 {
     Keypad::Tick();
-    if (millis() - lastApiMillis > 1000)
+    if (millis() - lastApiMillis > 500)
     {
         lastApiMillis = millis();
         SerialAPI::HandleSerial();
